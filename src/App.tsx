@@ -1,5 +1,5 @@
-import './App.css'
-import PlayerCard from './components/leaderboard/card/PlayerCard.tsx'
+import './App.css';
+import { Leaderboard } from './components/Leaderboard';
 
 function App() {
   return (
@@ -7,7 +7,7 @@ function App() {
       <h1>
         Destiny Site!
       </h1>
-      <PlayerCard />
+      <Leaderboard />
     </>
   )
 }
