@@ -13,19 +13,21 @@ export const Leaderboard = () => {
     ]);
 
     const [colDefs, setColDefs] = useState<ColDef<any>[]>([
-        { field: "name" },
-        { field: "class" },
-        { field: "kills" },
-        { field: "deaths" }
+        { field: "name", flex: 1 },
+        { field: "class",flex: 1 },
+        { field: "kills", flex: 1},
+        { field: "deaths", flex: 1 }
     ]);
 
     return (
-        <div className="leaderboard-div">
-            <AgGridReact
-                rowData={rowData}
-                columnDefs={colDefs}
-                theme={themeMaterial}
-            />
+        <div className="div-wrapper">
+            <div className="leaderboard-div">
+                <AgGridReact
+                    rowData={rowData}
+                    columnDefs={colDefs}
+                    theme={themeMaterial}
+                />
+            </div>
         </div>
     )
 }
