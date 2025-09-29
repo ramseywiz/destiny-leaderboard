@@ -7,6 +7,15 @@ import './Leaderboard.css'
 
 
 export const Leaderboard = () => {
+    const [flipped, setFlipped] = useState<boolean>(false);
+
+    const flipData = () => {
+        if (flipped) {
+            setFlipped(!flipped)
+        } else {
+            setFlipped(!flipped);
+        }
+    }
 
     const [rowData, setRowData] = useState([
         { name: "Vultorz", class: "Warlock", kills: 23, deaths: true },
@@ -29,6 +38,9 @@ export const Leaderboard = () => {
                     theme={themeMaterial}
                 />
             </div>
+            <button onClick={flipData}>
+                flip between two diff content
+            </button>
         </div>
     )
 }
