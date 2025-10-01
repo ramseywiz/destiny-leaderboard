@@ -1,0 +1,20 @@
+.addRowDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+button {
+    border: none;
+    background-color: aquamarine;
+    padding: 15px 32px;
+    font-size: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition-duration: .4s;
+}
+
+button:hover {
+    background-color: aqua;
+    transition-duration: .4s;
+}
