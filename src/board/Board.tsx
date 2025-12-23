@@ -17,9 +17,19 @@ export const Board = () => {
         { field: "deaths", flex: 1 }
     ]);
 
+    const handleAddRow = () => {
+        const newRow = {
+            name: "Guardian",
+            class: "Hunter",
+            kills: 0,
+            deaths: false
+        };
+        setRowData([...rowData, newRow]);
+    };
+
     return (
         <div>
-            <AddRowButton />
+            <AddRowButton onClick={handleAddRow} />
             <div className="div-wrapper">
                 <Leaderboard rows={rowData} cols={colDefs} />
             </div>

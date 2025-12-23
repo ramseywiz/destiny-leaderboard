@@ -8,7 +8,7 @@ type LeaderboardProps = {
     cols: any[];
 };
 
-export const Leaderboard = ({rows, cols}: LeaderboardProps) => {
+export const Leaderboard = ({ rows, cols }: LeaderboardProps) => {
     return (
         <div className="leaderboard-div">
             <AgGridReact
