@@ -1,5 +1,5 @@
 import './App.css';
-import { Leaderboard } from './components/Leaderboard';
+import { Board } from './board/Board';
 
 function App() {
   return (
@@ -7,7 +7,7 @@ function App() {
       <h1 className="title">
         Destiny Site!
       </h1>
-      <Leaderboard />
+      <Board />
     </>
   )
 }
