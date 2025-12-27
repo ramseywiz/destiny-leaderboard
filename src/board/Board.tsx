@@ -3,6 +3,7 @@ import { Leaderboard } from "../components/Leaderboard";
 import "./Board.css"
 import { useState } from "react";
 import type { ColDef } from "ag-grid-community";
+import { bungieRequest } from "../bungie-api-helper";
 
 export const Board = () => {
     const [rowData, setRowData] = useState([
@@ -18,6 +19,7 @@ export const Board = () => {
     ]);
 
     const handleAddRow = () => {
+        /*
         const newRow = {
             name: "Guardian",
             class: "Hunter",
@@ -25,6 +27,21 @@ export const Board = () => {
             deaths: false
         };
         setRowData([...rowData, newRow]);
+        */
+        try {
+            const profile = bungieRequest("/Destiny2/SearchDestinyPlayerByBungieName/-1/", {
+                method: "POST",
+                body: JSON.stringify({
+                    displayName: "Loqueres",
+                    displayNameCode: 4289,
+                })
+            });
+            console.log(profile);
+        } catch (e) {
+            console.error(e);
+        }
+
+
     };
 
     return (
