@@ -4,6 +4,7 @@ import "./Board.css"
 import { useState } from "react";
 import type { ColDef } from "ag-grid-community";
 import { bungieRequest } from "../bungie-api-helper";
+import type { BungieResponse, UserInfoCard } from "../bungie-api-enums";
 
 export const Board = () => {
     const [rowData, setRowData] = useState([
@@ -18,7 +19,7 @@ export const Board = () => {
         { field: "deaths", flex: 1 }
     ]);
 
-    const handleAddRow = () => {
+    const handleAddRow = async () => {
         /*
         const newRow = {
             name: "Guardian",
@@ -29,14 +30,19 @@ export const Board = () => {
         setRowData([...rowData, newRow]);
         */
         try {
-            const profile = bungieRequest("/Destiny2/SearchDestinyPlayerByBungieName/-1/", {
+            const profile = await bungieRequest<BungieResponse<UserInfoCard>>("/Destiny2/SearchDestinyPlayerByBungieName/-1/", {
                 method: "POST",
                 body: JSON.stringify({
                     displayName: "Loqueres",
                     displayNameCode: 4289,
                 })
             });
-            console.log(profile);
+
+            console.log(profile.Response);
+
+            //membershipType = profile.
+
+            //const data = bungieRequest(`/Destiny2/{membershipType}/Profile/{destinyMembershipId}/`)
         } catch (e) {
             console.error(e);
         }
