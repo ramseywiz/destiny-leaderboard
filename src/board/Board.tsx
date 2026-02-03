@@ -43,11 +43,13 @@ export const Board = () => {
             const membershipType = profileRes.membershipType;
             const destinyMembershipId = profileRes.membershipId;
 
-            const data = await bungieRequest<BungieResponse<DestinyProfileResponse>>(`/Destiny2/${membershipType}/Profile/${destinyMembershipId}/?components=Profiles`, {
+            const data = await bungieRequest<BungieResponse<DestinyProfileResponse>>(`/Destiny2/${membershipType}/Profile/${destinyMembershipId}/?components=Profiles, Characters`, {
                 method: "GET"
-            })
+            });
 
-            console.log(data.Response.profile.data.characterIds);
+            const characterIds = data.Response.profile.data.characterIds;
+
+            const activityStats = await bungieRequest(`/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/AggregateActivityStats/`);
         } catch (e) {
             console.error(e);
         }
