@@ -4,7 +4,7 @@ import "./Board.css"
 import { useState } from "react";
 import type { ColDef } from "ag-grid-community";
 import { bungieRequest } from "../bungie-api-helper";
-import type { BungieResponse, UserInfoCard } from "../bungie-api-enums";
+import { type DestinyProfileResponse, type BungieResponse, type UserInfoCard } from "../bungie-api-enums";
 
 export const Board = () => {
     const [rowData, setRowData] = useState([
@@ -30,7 +30,7 @@ export const Board = () => {
         setRowData([...rowData, newRow]);
         */
         try {
-            const profile = await bungieRequest<BungieResponse<UserInfoCard>>("/Destiny2/SearchDestinyPlayerByBungieName/-1/", {
+            const profile = await bungieRequest<BungieResponse<UserInfoCard[]>>("/Destiny2/SearchDestinyPlayerByBungieName/-1/", {
                 method: "POST",
                 body: JSON.stringify({
                     displayName: "Loqueres",
@@ -38,16 +38,19 @@ export const Board = () => {
                 })
             });
 
-            console.log(profile.Response);
+            const profileRes = profile.Response[0];
 
-            //membershipType = profile.
+            const membershipType = profileRes.membershipType;
+            const destinyMembershipId = profileRes.membershipId;
 
-            //const data = bungieRequest(`/Destiny2/{membershipType}/Profile/{destinyMembershipId}/`)
+            const data = await bungieRequest<BungieResponse<DestinyProfileResponse>>(`/Destiny2/${membershipType}/Profile/${destinyMembershipId}/?components=Profiles`, {
+                method: "GET"
+            })
+
+            console.log(data.Response.profile.data.characterIds);
         } catch (e) {
             console.error(e);
         }
-
-
     };
 
     return (
