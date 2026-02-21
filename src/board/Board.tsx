@@ -3,8 +3,7 @@ import { Leaderboard } from "../components/Leaderboard";
 import "./Board.css"
 import { useState } from "react";
 import type { ColDef } from "ag-grid-community";
-import { bungieRequest } from "../bungie-api-helper";
-import { type DestinyProfileResponse, type BungieResponse, type UserInfoCard } from "../bungie-api-enums";
+import { getDungeonStats } from "../api/get-dungeon-stats";
 
 export const Board = () => {
     const [rowData, setRowData] = useState([
@@ -30,26 +29,10 @@ export const Board = () => {
         setRowData([...rowData, newRow]);
         */
         try {
-            const profile = await bungieRequest<BungieResponse<UserInfoCard[]>>("/Destiny2/SearchDestinyPlayerByBungieName/-1/", {
-                method: "POST",
-                body: JSON.stringify({
-                    displayName: "Loqueres",
-                    displayNameCode: 4289,
-                })
+            await getDungeonStats({
+                displayName: "Loqueres",
+                displayNameCode: 4289
             });
-
-            const profileRes = profile.Response[0];
-
-            const membershipType = profileRes.membershipType;
-            const destinyMembershipId = profileRes.membershipId;
-
-            const data = await bungieRequest<BungieResponse<DestinyProfileResponse>>(`/Destiny2/${membershipType}/Profile/${destinyMembershipId}/?components=Profiles, Characters`, {
-                method: "GET"
-            });
-
-            const characterIds = data.Response.profile.data.characterIds;
-
-            const activityStats = await bungieRequest(`/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/AggregateActivityStats/`);
         } catch (e) {
             console.error(e);
         }
