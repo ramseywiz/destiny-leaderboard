@@ -55,8 +55,25 @@ export interface DungeonDetails {
 }
 
 export interface DungeonValues {
-    activityDurationSeconds: object;
-    assists: BasicStat;
+    /*
+    assists:
+    completed:
+    deaths: BasicStat;
+    kills: BasicStat;
+    efficiency: BasicStat;
+    killsDeathsRatio: BasicStat;
+    killsDeathsAssists: BasicStat;
+    score: BasicStat;
+    activityDurationSeconds: BasicStat;
+    team: BasicStat;
+    completionReason: BasicStat;
+    fireteamId: BasicStat;
+    startSeconds: BasicStat;
+    timePlayedSeconds: BasicStat;
+    playerCount: BasicStat;
+    teamScore: BasicStat;
+    */
+    [key: string]: BasicStat;
 }
 
 export interface BasicStat {

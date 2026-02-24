@@ -1,5 +1,5 @@
-import type { ActivitesComponent, BungieResponse, DestinyProfileResponse, DungeonActivitesData, UserInfoCard } from "../bungie-api-enums";
-import { bungieRequest } from "../bungie-api-helper";
+import type { ActivitesComponent, BungieResponse, DestinyProfileResponse, DungeonActivitesData, UserInfoCard } from "../enums/bungie-api-enums";
+import { bungieRequest } from "./bungie-api-helper";
 
 export interface dungeonProps {
     displayName: string;
@@ -29,23 +29,40 @@ export async function getDungeonStats({ displayName, displayNameCode }: dungeonP
     //const activityStats = await bungieRequest(`/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/AggregateActivityStats/`);
     const dungeonStats: DungeonActivitesData[] = [];
 
+    let page = 0;
 
-    const dungeonApi = await bungieRequest<BungieResponse<ActivitesComponent>>(`/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/Activities/?mode=82&count=250`, {
+    let dungeonApi = await bungieRequest<BungieResponse<ActivitesComponent>>(`/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/Activities/?mode=82&count=250&page=${page}`, {
         method: "GET"
     });
 
     dungeonStats.push(...dungeonApi.Response.activities);
 
-    let page = 0;
-
     while (dungeonStats.length % 250 === 0) {
         page += 1;
-        const dungeonApi = await bungieRequest<BungieResponse<ActivitesComponent>>(`/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/Activities/?mode=82&count=250&page=${page}`, {
+        dungeonApi = await bungieRequest<BungieResponse<ActivitesComponent>>(`/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/Activities/?mode=82&count=250&page=${page}`, {
             method: "GET"
         });
 
         dungeonStats.push(...dungeonApi.Response.activities);
     }
 
-    console.log(dungeonStats);
+    //console.log(dungeonStats);
+    return dungeonStats;
+}
+
+export async function parseDungeonStats(dungeonStats: DungeonActivitesData[]) {
+    const parsedStats = dungeonStats.map(x => {
+        return {
+            instanceId: x.activityDetails.instanceId,
+            referenceId: x.activityDetails.referenceId,
+            period: x.period,
+            kills: x.values.kills.basic.value,
+            deaths: x.values.deaths.basic.value,
+            assists: x.values.assists.basic.value,
+            completed: x.values.completed.basic.value
+        }
+    });
+
+    console.log(parsedStats);
+    return parsedStats;
 }
