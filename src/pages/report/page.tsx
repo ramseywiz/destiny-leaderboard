@@ -2,15 +2,13 @@ import { useParams } from "react-router-dom";
 import { getDungeonStats, parseDungeonStats } from "../../api/get-dungeon-stats";
 
 export const SummaryPage = () => {
-    const { membershipId } = useParams();
+    const { platform, membershipId } = useParams();
 
     const handleAddRow = async () => {
+        if (platform === undefined || membershipId === undefined) return;
+        
         try {
-            const dungeonData = await getDungeonStats({
-                displayName: "ram",
-                displayNameCode: 2028
-            });
-
+            const dungeonData = await getDungeonStats(platform, membershipId);
             const parsedData = await parseDungeonStats(dungeonData);
             console.log(parsedData);
         } catch (e) {
@@ -20,7 +18,7 @@ export const SummaryPage = () => {
 
     return (
         <div>
-            <h1>{membershipId}</h1>
+            <h1>{platform} - {membershipId}</h1>
             <button onClick={handleAddRow}>Load Dungeon Stats</button>
         </div>
     );
