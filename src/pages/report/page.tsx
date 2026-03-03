@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { getDungeonStats, parseDungeonStats } from "../../api/get-dungeon-stats";
-import { PlayerBanner } from "../../components/player-banner";
+import { PlayerBanner } from "../../components/report/player-banner";
 import { useEffect, useRef, useState } from "react";
 import { bungieRequest } from "../../api/bungie-api-helper";
 import type { BungieResponse, DestinyProfileResponse } from "../../enums/bungie-api-enums";
@@ -9,7 +9,8 @@ export const SummaryPage = () => {
     const { platform, membershipId } = useParams();
 
     const [playerName, setPlayerName] = useState<string>("Loading...");
-    const [bannerUrl, setBannerUrl] = useState<string | null>(null);
+    const [bannerUrl, setBannerUrl] = useState<string>("");
+    const [iconUrl, setIconUrl] = useState<string>("");
     const [dungeonStats, setDungeonStats] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -42,6 +43,7 @@ export const SummaryPage = () => {
                 ]);
 
                 setBannerUrl(`https://www.bungie.net${emblemRes.Response.secondarySpecial}`);
+                setIconUrl(`https://www.bungie.net${emblemRes.Response.displayProperties.icon}`);
 
                 const code = profileData.bungieGlobalDisplayNameCode.toString();
                 setPlayerName(`${profileData.bungieGlobalDisplayName}#${code}`);
@@ -62,7 +64,7 @@ export const SummaryPage = () => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <PlayerBanner playerName={playerName} bannerUrl={bannerUrl} />
+            <PlayerBanner playerName={playerName} bannerUrl={bannerUrl} iconUrl={iconUrl} />
             <div style={{ marginTop: "20px" }}>
                 {isLoading ? (
                     <p>Loading dungeon stats...</p>
