@@ -1,45 +1,48 @@
-import type { ActivitesComponent, BungieResponse, DestinyProfileResponse, DungeonActivitesData } from "../enums/bungie-api-enums";
+import type { ActivitesComponent, BungieResponse, DungeonActivitesData } from "../enums/bungie-api-enums";
 import { bungieRequest } from "./bungie-api-helper";
 
 export async function getDungeonStats(
     membershipType: string,
-    destinyMembershipId: string) 
-    {    
-
-   const dungeonStats: DungeonActivitesData[] = [];
-    
-    try {
-        const data = await bungieRequest<BungieResponse<DestinyProfileResponse>>(`/Destiny2/${membershipType}/Profile/${destinyMembershipId}/?components=Profiles, Characters`, {
-            method: "GET"
-        });
-
-        const characterIds = data.Response.profile.data.characterIds;
+    destinyMembershipId: string,
+    characterIds: number[]
+) {
+    const fetchCharacter = async (characterId: number) => {
+        const dungeonStats: DungeonActivitesData[] = [];
         let page = 0;
 
-        let dungeonApi = await bungieRequest<BungieResponse<ActivitesComponent>>(`/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/Activities/?mode=82&count=250&page=${page}`, {
-            method: "GET"
-        });
+        let dungeonApi = await bungieRequest<BungieResponse<ActivitesComponent>>(
+            `/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterId}/Stats/Activities/?mode=82&count=250&page=${page}`
+        );
 
         dungeonStats.push(...dungeonApi.Response.activities);
 
         while (dungeonStats.length % 250 === 0) {
             page += 1;
-            dungeonApi = await bungieRequest<BungieResponse<ActivitesComponent>>(`/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/Activities/?mode=82&count=250&page=${page}`, {
-                method: "GET"
-            });
+
+            dungeonApi = await bungieRequest<BungieResponse<ActivitesComponent>>(
+                `/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterId}/Stats/Activities/?mode=82&count=250&page=${page}`
+            );
 
             dungeonStats.push(...dungeonApi.Response.activities);
         }
 
-        //console.log(dungeonStats);
         return dungeonStats;
+    };
+
+    try {
+        const res = await Promise.all(
+            characterIds.map((x) => fetchCharacter(x))
+        );
+
+        return res.flat();
     }
     catch (e) {
         console.error(e);
         return [];
-    }{}
-    //const activityStats = await bungieRequest(`/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterIds[0]}/Stats/AggregateActivityStats/`);
+    }
 }
+
+
 
 export async function parseDungeonStats(dungeonStats: DungeonActivitesData[]) {
     const parsedStats = dungeonStats.map(x => {

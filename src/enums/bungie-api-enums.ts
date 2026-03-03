@@ -7,8 +7,8 @@ export interface UserInfoCard {
     membershipType?: number;
     membershipId?: number;
     displayName?: string;
-    bungieGlobalDisplayName?: string;
-    bungieGlobalDisplayNameCode?: string;
+    bungieGlobalDisplayName: string;
+    bungieGlobalDisplayNameCode: string;
 };
 
 export interface BungieResponse<T> {
@@ -24,7 +24,45 @@ export interface DestinyProfileResponse {
     responseMintedTimestamp: Date;
     secondaryComponentsMintedTimestamp: Date;
     profile: ProfilesComponent;
+    characters: CharactersComponent;
 };
+
+export interface CharactersComponent {
+    data: CharactersData;
+}
+
+export interface CharactersData {
+    [characterId: string]: DestinyCharacter;
+}
+
+export interface DestinyCharacter {
+    membershipId: string;
+    membershipType: number;
+    characterId: string;
+    dateLastPlayed: string;
+    minutesPlayedThisSession: string;
+    minutesPlayedTotal: string;
+    light: number;
+    stats: Record<string, number>;
+    raceHash: number;
+    genderHash: number;
+    classHash: number;
+    raceType: number;
+    classType: number;
+    genderType: number;
+    emblemPath: string;
+    emblemBackgroundPath: string;
+    emblemHash: number;
+    emblemColor: {
+        red: number;
+        green: number;
+        blue: number;
+        alpha: number;
+    };
+    baseCharacterLevel: number;
+    percentToNextLevel: number;
+    titleRecordHash?: number;
+}
 
 export interface ProfilesComponent {
     data: ProfilesComponentData;
@@ -34,6 +72,7 @@ export interface ProfilesComponent {
 export interface ProfilesComponentData {
     // there is a LOT here but for now we only care about this
     characterIds: number[];
+    userInfo: UserInfoCard;
 }
 
 export interface ActivitesComponent {

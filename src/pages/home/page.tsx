@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 
 export const HomePage = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [name, setName] = useState("");
-    const [code, setCode] = useState("");
+    const [name, setName] = useState("ram");
+    const [code, setCode] = useState("2028");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const navigate = useNavigate();
@@ -59,8 +59,8 @@ export const HomePage = () => {
                         disabled={isSubmitting}
                     />
                     <button onClick={handleSubmit}>Submit</button>
-                    <br/>
-                    <br/>
+                    <br />
+                    <br />
                     <button onClick={() => setIsDialogOpen(false)}>Close</button>
                 </div>
             )}
