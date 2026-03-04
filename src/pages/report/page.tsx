@@ -9,6 +9,7 @@ export const SummaryPage = () => {
     const { platform, membershipId } = useParams();
 
     const [playerName, setPlayerName] = useState<string>("-");
+    const [playerCode, setPlayerCode] = useState<string>("-");
     const [bannerUrl, setBannerUrl] = useState<string>("");
     const [iconUrl, setIconUrl] = useState<string>("");
     const [dungeonStats, setDungeonStats] = useState<any[]>([]);
@@ -37,7 +38,8 @@ export const SummaryPage = () => {
 
                 const firstChar = charactersData[characterIds[0]];
 
-                setPlayerName(`${profileData.bungieGlobalDisplayName}#${profileData.bungieGlobalDisplayNameCode}`);
+                setPlayerName(profileData.bungieGlobalDisplayName);
+                setPlayerCode(profileData.bungieGlobalDisplayNameCode);
 
                 const emblemRes = await bungieRequest<BungieResponse<EmblemLookupResponse>>(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${firstChar.emblemHash}/`);
 
@@ -62,7 +64,7 @@ export const SummaryPage = () => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <PlayerBanner playerName={playerName} bannerUrl={bannerUrl} iconUrl={iconUrl} />
+            <PlayerBanner playerName={playerName} playerCode={playerCode} bannerUrl={bannerUrl} iconUrl={iconUrl} />
             <div style={{ marginTop: "20px" }}>
                 {isLoading ? (
                     <p>Loading dungeon stats...</p>
