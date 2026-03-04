@@ -47,8 +47,7 @@ export async function getDungeonStats(
 export async function parseDungeonStats(dungeonStats: DungeonActivitesData[]) {
     const parsedStats = dungeonStats.map(x => {
         return {
-            instanceId: x.activityDetails.instanceId,
-            referenceId: x.activityDetails.referenceId,
+            directoryActivityHash: x.activityDetails.directoryActivityHash,
             period: x.period,
             kills: x.values.kills.basic.value,
             deaths: x.values.deaths.basic.value,

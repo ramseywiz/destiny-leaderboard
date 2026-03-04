@@ -3,12 +3,12 @@ import { getDungeonStats, parseDungeonStats } from "../../api/get-dungeon-stats"
 import { PlayerBanner } from "../../components/report/player-banner";
 import { useEffect, useRef, useState } from "react";
 import { bungieRequest } from "../../api/bungie-api-helper";
-import type { BungieResponse, DestinyProfileResponse } from "../../enums/bungie-api-enums";
+import type { BungieResponse, DestinyProfileResponse, EmblemLookupResponse } from "../../enums/bungie-api-enums";
 
 export const SummaryPage = () => {
     const { platform, membershipId } = useParams();
 
-    const [playerName, setPlayerName] = useState<string>("Loading...");
+    const [playerName, setPlayerName] = useState<string>("-");
     const [bannerUrl, setBannerUrl] = useState<string>("");
     const [iconUrl, setIconUrl] = useState<string>("");
     const [dungeonStats, setDungeonStats] = useState<any[]>([]);
@@ -37,16 +37,14 @@ export const SummaryPage = () => {
 
                 const firstChar = charactersData[characterIds[0]];
 
-                const [rawDungeonData, emblemRes] = await Promise.all([
-                    getDungeonStats(platform, membershipId, characterIds),
-                    bungieRequest<any>(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${firstChar.emblemHash}/`)
-                ]);
+                setPlayerName(`${profileData.bungieGlobalDisplayName}#${profileData.bungieGlobalDisplayNameCode}`);
+
+                const emblemRes = await bungieRequest<BungieResponse<EmblemLookupResponse>>(`/Destiny2/Manifest/DestinyInventoryItemDefinition/${firstChar.emblemHash}/`);
 
                 setBannerUrl(`https://www.bungie.net${emblemRes.Response.secondarySpecial}`);
                 setIconUrl(`https://www.bungie.net${emblemRes.Response.displayProperties.icon}`);
 
-                const code = profileData.bungieGlobalDisplayNameCode.toString();
-                setPlayerName(`${profileData.bungieGlobalDisplayName}#${code}`);
+                const rawDungeonData = await getDungeonStats(platform, membershipId, characterIds);
 
                 const parsedData = await parseDungeonStats(rawDungeonData);
                 setDungeonStats(parsedData);

@@ -20,6 +20,13 @@ export interface BungieResponse<T> {
     MessageData: Record<string, string>;
 };
 
+export interface EmblemLookupResponse {
+    displayProperties: {
+        icon: string;
+    };
+    secondarySpecial: string;
+}
+
 export interface DestinyProfileResponse {
     responseMintedTimestamp: Date;
     secondaryComponentsMintedTimestamp: Date;

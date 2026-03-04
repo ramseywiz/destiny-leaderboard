@@ -23,6 +23,7 @@ export const PlayerBanner = ({ playerName, bannerUrl, iconUrl }: PlayerBannerPro
                 </div>
                 <div className="player-stats">
                     <StatBox title="Clears" value="-" />
+                    <StatBox title="Speed Sum" value="-" />
                     <StatBox title="In Dungeon Time" value="-" />
                 </div>
             </div>
