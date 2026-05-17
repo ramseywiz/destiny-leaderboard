@@ -77,7 +77,6 @@ export interface ProfilesComponent {
 }
 
 export interface ProfilesComponentData {
-    // there is a LOT here but for now we only care about this
     characterIds: number[];
     userInfo: UserInfoCard;
 }
@@ -94,31 +93,13 @@ export interface DungeonActivitesData {
 }
 
 export interface DungeonDetails {
-    directoryActivityHash: number;
+    directorActivityHash: number;
     instanceId: string;
     isPrivate: boolean;
     referenceId: number;
 }
 
 export interface DungeonValues {
-    /*
-    assists:
-    completed:
-    deaths: BasicStat;
-    kills: BasicStat;
-    efficiency: BasicStat;
-    killsDeathsRatio: BasicStat;
-    killsDeathsAssists: BasicStat;
-    score: BasicStat;
-    activityDurationSeconds: BasicStat;
-    team: BasicStat;
-    completionReason: BasicStat;
-    fireteamId: BasicStat;
-    startSeconds: BasicStat;
-    timePlayedSeconds: BasicStat;
-    playerCount: BasicStat;
-    teamScore: BasicStat;
-    */
     [key: string]: BasicStat;
 }
 
@@ -129,4 +110,39 @@ export interface BasicStat {
 export interface StatObject {
     displayValue: string;
     value: number;
+}
+
+export interface DestinyActivityDefinition {
+    displayProperties: {
+        name: string;
+        description: string;
+        icon: string;
+        hasIcon: boolean;
+    };
+    pgcrImage: string;
+    activityTypeHash: number;
+    activityModeTypes: number[];
+    isPvP: boolean;
+}
+
+export interface ParsedRun {
+    directorActivityHash: number;
+    referenceId: number;
+    instanceId: string;
+    period: Date;
+    kills: number;
+    deaths: number;
+    assists: number;
+    completed: boolean;
+    completionReason: number;
+    activityDurationSeconds: number;
+    playerCount: number;
+}
+
+export interface DungeonGroup {
+    id: string;
+    representativeHash: number;
+    activityName: string;
+    pgcrImage: string;
+    runs: ParsedRun[];
 }

@@ -3,33 +3,61 @@ interface PlayerBannerProps {
     playerCode: string;
     bannerUrl: string;
     iconUrl: string;
+    totalClears: number;
+    speedSum: number;
+    totalTimePlayed: number;
 }
 
-export const PlayerBanner = ({ playerName, playerCode, bannerUrl, iconUrl }: PlayerBannerProps) => {
+function formatDuration(seconds: number): string {
+    if (!seconds || seconds <= 0) return "--";
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+function formatTimePlayed(seconds: number): string {
+    if (!seconds || seconds <= 0) return "--";
+    const d = Math.floor(seconds / 86400);
+    const h = Math.floor((seconds % 86400) / 3600);
+    if (d > 0) return `${d}d ${h}h`;
+    const m = Math.floor((seconds % 3600) / 60);
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+export const PlayerBanner = ({
+    playerName,
+    playerCode,
+    bannerUrl,
+    iconUrl,
+    totalClears,
+    speedSum,
+    totalTimePlayed,
+}: PlayerBannerProps) => {
     return (
         <div className="player-card">
             <div
                 className="player-banner"
                 style={{
-                    backgroundImage: bannerUrl ? `url(${bannerUrl})` : "none"
+                    backgroundImage: bannerUrl ? `url(${bannerUrl})` : "none",
                 }}
             />
             <div className="player-content">
-                <img
-                    className="player-avatar"
-                    src={iconUrl}
-                />
-                <div className="player-name">
-                    {playerName}<span style={{ color: 'gray' }}>#{playerCode}</span>
-                </div>
-                <div className="player-info">
+                {iconUrl && (
+                    <img
+                        className="player-avatar"
+                        src={iconUrl}
+                        alt={`${playerName} emblem`}
+                    />
+                )}
 
-                    <div className="player-stats">
-                        <StatBox title="Clears" value="-" />
-                        <StatBox title="Speed Sum" value="-" />
-                        <StatBox title="Play Time" value="-" />
-                    </div>
+                <div className="player-name-block">
+                    <div className="player-name">{playerName}</div>
+                    <div className="player-code">#{playerCode}</div>
                 </div>
+
+                <StatBox title="Full Clears" value={totalClears > 0 ? String(totalClears) : "--"} />
+                <StatBox title="Speed Time" value={formatDuration(speedSum)} />
+                <StatBox title="In Dungeon Time" value={formatTimePlayed(totalTimePlayed)} />
             </div>
         </div>
     );
