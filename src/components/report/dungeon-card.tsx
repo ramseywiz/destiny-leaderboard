@@ -1,15 +1,35 @@
 import { useEffect, useRef, useState } from "react";
+import type { MouseEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     dedupeRunsByInstanceId,
     isDefaultGraphRun,
     isSuccessfulCompletion,
 } from "../../api/dungeon-run-filters";
 import type { ParsedRun } from "../../enums/bungie-api-enums";
+import {
+    formatDuration,
+    formatNumber,
+    formatRunAge,
+    formatTimePlayed,
+    formatTooltipDuration,
+    getGraphDotY,
+    median,
+} from "../../utils/report-format";
 
 interface DungeonCardProps {
     activityName: string;
     pgcrImage: string;
     runs: ParsedRun[];
+}
+
+interface GraphTooltip {
+    x: number;
+    y: number;
+    placement: "left" | "right";
+    duration: string;
+    age: string;
+    successful: boolean;
 }
 
 const GRAPH_HEIGHT = 64;
@@ -19,66 +39,18 @@ const GRAPH_BOTTOM_Y = GRAPH_HEIGHT - 9;
 const GRAPH_DOT_SPACING = 20;
 const GRAPH_DOT_RADIUS = 5.5;
 
-function formatDuration(seconds: number): string {
-    if (!seconds || seconds <= 0) return "--";
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    return h > 0 ? `${h}h ${m}m` : `${m}m`;
-}
-
-function formatTimePlayed(seconds: number): string {
-    if (!seconds || seconds <= 0) return "--";
-    const d = Math.floor(seconds / 86400);
-    const h = Math.floor((seconds % 86400) / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    if (d > 0) return `${d}d ${h}h`;
-    if (h > 0) return `${h}h ${m}m`;
-    return `${m}m`;
-}
-
-function formatNumber(value: number): string {
-    return new Intl.NumberFormat("en-US").format(value);
-}
-
-function median(values: number[]): number {
-    if (values.length === 0) return 0;
-    const sorted = [...values].sort((a, b) => a - b);
-    const middle = Math.floor(sorted.length / 2);
-
-    if (sorted.length % 2 === 1) {
-        return sorted[middle] ?? 0;
-    }
-
-    return ((sorted[middle - 1] ?? 0) + (sorted[middle] ?? 0)) / 2;
-}
-
-function getSoloTag(completedRuns: ParsedRun[]): string | null {
+const getSoloTag = (completedRuns: ParsedRun[]): string | null => {
     const soloRuns = completedRuns.filter((run) => run.playerCount === 1);
     if (soloRuns.some((run) => run.deaths === 0)) return "Solo Flawless";
     if (soloRuns.length > 0) return "Solo";
     return null;
-}
-
-function lerp(start: number, end: number, pct: number): number {
-    return start + (end - start) * Math.max(0, Math.min(1, pct));
-}
-
-function getDotY(seconds: number, fastest: number, average: number, slowest: number): number {
-    if (!seconds || seconds <= 0 || !average) return GRAPH_BOTTOM_Y;
-    if (fastest === slowest) return GRAPH_LINE_Y;
-
-    if (seconds <= average) {
-        const range = Math.max(average - fastest, 1);
-        return lerp(GRAPH_TOP_Y, GRAPH_LINE_Y, (seconds - fastest) / range);
-    }
-
-    const range = Math.max(slowest - average, 1);
-    return lerp(GRAPH_LINE_Y, GRAPH_BOTTOM_Y, (seconds - average) / range);
-}
+};
 
 export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps) => {
+    const navigate = useNavigate();
     const timelineRef = useRef<HTMLDivElement>(null);
     const [isTimelineScrollable, setIsTimelineScrollable] = useState(false);
+    const [graphTooltip, setGraphTooltip] = useState<GraphTooltip | null>(null);
     const uniqueRuns = dedupeRunsByInstanceId(runs);
     const completedRuns = uniqueRuns.filter(isSuccessfulCompletion);
     const graphRuns = uniqueRuns.filter(isDefaultGraphRun);
@@ -108,12 +80,46 @@ export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps)
     const graphAverageSeconds = avgSeconds || median(graphTimes);
 
     const totalSeconds = uniqueRuns.reduce((sum, r) => sum + r.activityDurationSeconds, 0);
-    const totalKills = uniqueRuns.reduce((sum, r) => sum + r.kills, 0);
-    const totalDeaths = uniqueRuns.reduce((sum, r) => sum + r.deaths, 0);
-    const totalAssists = uniqueRuns.reduce((sum, r) => sum + r.assists, 0);
+    const solos = completedRuns.filter((run) => run.playerCount === 1).length;
+    const soloFlawlesses = completedRuns.filter(
+        (run) => run.playerCount === 1 && run.deaths === 0
+    ).length;
 
     const soloTag = getSoloTag(completedRuns);
     const graphWidth = Math.max(chronological.length * GRAPH_DOT_SPACING, 220);
+
+    const showGraphTooltip = (
+        run: ParsedRun,
+        successful: boolean,
+        position: { x: number; y: number; placement?: GraphTooltip["placement"] }
+    ) => {
+        setGraphTooltip({
+            x: position.x,
+            y: position.y,
+            placement: position.placement ?? "right",
+            duration: formatTooltipDuration(run.activityDurationSeconds),
+            age: formatRunAge(run.period),
+            successful,
+        });
+    };
+
+    const showGraphMouseTooltip = (
+        event: MouseEvent<Element>,
+        run: ParsedRun,
+        successful: boolean
+    ) => {
+        const track = timelineRef.current;
+        if (!track) return;
+
+        const rect = track.getBoundingClientRect();
+        const x = event.clientX - rect.left + track.scrollLeft;
+        const placement = event.clientX - rect.left > track.clientWidth - 110 ? "left" : "right";
+        showGraphTooltip(run, successful, {
+            x,
+            y: event.clientY - rect.top,
+            placement,
+        });
+    };
 
     useEffect(() => {
         const track = timelineRef.current;
@@ -180,28 +186,64 @@ export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps)
                             {chronological.map((run, index) => {
                                 const successful = isSuccessfulCompletion(run);
                                 const x = GRAPH_DOT_SPACING / 2 + index * GRAPH_DOT_SPACING;
-                                const y = getDotY(
-                                    run.activityDurationSeconds,
-                                    fastestGraphSeconds,
-                                    graphAverageSeconds,
-                                    slowestGraphSeconds
-                                );
+                                const y = getGraphDotY({
+                                    seconds: run.activityDurationSeconds,
+                                    fastest: fastestGraphSeconds,
+                                    average: graphAverageSeconds,
+                                    slowest: slowestGraphSeconds,
+                                    topY: GRAPH_TOP_Y,
+                                    lineY: GRAPH_LINE_Y,
+                                    bottomY: GRAPH_BOTTOM_Y,
+                                });
+                                const label = successful ? "Clear" : "Attempt";
 
                                 return (
-                                    <g
+                                    <a
                                         key={run.instanceId}
+                                        href={`/pcgr/${run.instanceId}`}
                                         className={`dungeon-dot-node ${successful ? "dot-clear" : "dot-fail"}`}
+                                        aria-label={`${label} - ${formatDuration(run.activityDurationSeconds)}, ${formatRunAge(run.period)}`}
+                                        onBlur={() => setGraphTooltip(null)}
+                                        onClick={(event) => {
+                                            event.preventDefault();
+                                            navigate(`/pcgr/${run.instanceId}`);
+                                        }}
+                                        onFocus={() =>
+                                            showGraphTooltip(run, successful, {
+                                                x,
+                                                y,
+                                            })
+                                        }
+                                        onMouseEnter={(event) => showGraphMouseTooltip(event, run, successful)}
+                                        onMouseLeave={() => setGraphTooltip(null)}
+                                        onMouseMove={(event) => showGraphMouseTooltip(event, run, successful)}
                                     >
-                                        <title>
-                                            {successful
-                                                ? `Clear - ${formatDuration(run.activityDurationSeconds)}`
-                                                : `Attempt - ${formatDuration(run.activityDurationSeconds)}`}
-                                        </title>
                                         <circle cx={x} cy={y} r={GRAPH_DOT_RADIUS} />
-                                    </g>
+                                    </a>
                                 );
                             })}
                         </svg>
+                        {graphTooltip && (
+                            <div
+                                className="dungeon-dot-tooltip"
+                                data-placement={graphTooltip.placement}
+                                style={{
+                                    left: `${graphTooltip.x}px`,
+                                    top: `${Math.max(28, Math.min(graphTooltip.y, 48))}px`,
+                                }}
+                            >
+                                <div className="dungeon-dot-tooltip-time">
+                                    <span
+                                        className={`dungeon-dot-tooltip-marker ${graphTooltip.successful ? "dot-clear" : "dot-fail"
+                                            }`}
+                                    />
+                                    {graphTooltip.duration}
+                                </div>
+                                <div className="dungeon-dot-tooltip-age">
+                                    {graphTooltip.age}
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div className="dungeon-clears-num">{totalClears}</div>
                 </div>
@@ -236,27 +278,21 @@ export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps)
             <div className="dungeon-section dungeon-stat-row dungeon-stats-grid">
                 <div className="dungeon-stat-col">
                     <div className="dungeon-stat-value">
-                        {formatNumber(totalKills)}
-                    </div>
-                    <div className="dungeon-stat-label">KILLS</div>
-                </div>
-                <div className="dungeon-stat-col">
-                    <div className="dungeon-stat-value">
-                        {formatNumber(totalDeaths)}
-                    </div>
-                    <div className="dungeon-stat-label">DEATHS</div>
-                </div>
-                <div className="dungeon-stat-col">
-                    <div className="dungeon-stat-value">
-                        {formatNumber(totalAssists)}
-                    </div>
-                    <div className="dungeon-stat-label">ASSISTS</div>
-                </div>
-                <div className="dungeon-stat-col">
-                    <div className="dungeon-stat-value">
                         {formatTimePlayed(totalSeconds)}
                     </div>
-                    <div className="dungeon-stat-label">TIME</div>
+                    <div className="dungeon-stat-label">TIME PLAYED</div>
+                </div>
+                <div className="dungeon-stat-col">
+                    <div className="dungeon-stat-value">
+                        {formatNumber(solos)}
+                    </div>
+                    <div className="dungeon-stat-label">SOLOS</div>
+                </div>
+                <div className="dungeon-stat-col">
+                    <div className="dungeon-stat-value">
+                        {formatNumber(soloFlawlesses)}
+                    </div>
+                    <div className="dungeon-stat-label">SOLO FLAWLESSES</div>
                 </div>
             </div>
         </div>

@@ -60,16 +60,16 @@ strong {
 
 .player-content {
     display: grid;
-    grid-template-columns: 64px minmax(180px, 1fr) repeat(3, minmax(120px, auto));
+    grid-template-columns: 76px minmax(180px, 1fr) repeat(3, minmax(130px, auto));
     align-items: center;
-    gap: 18px;
+    gap: 22px;
     background: rgba(17, 17, 17, 0.78);
-    padding: 18px 22px;
+    padding: 26px 28px;
 }
 
 .player-avatar {
-    width: 64px;
-    height: 64px;
+    width: 76px;
+    height: 76px;
     object-fit: cover;
 }
 
@@ -78,7 +78,7 @@ strong {
 }
 
 .player-name {
-    font-size: 26px;
+    font-size: 30px;
     line-height: 1.1;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -86,9 +86,9 @@ strong {
 }
 
 .player-code {
-    margin-top: 4px;
-    color: #8d8d8d;
-    font-size: 13px;
+    margin-top: 6px;
+    color: #c3c3c3;
+    font-size: 15px;
 }
 
 .stat-box {
@@ -97,16 +97,16 @@ strong {
 }
 
 .stat-title {
-    color: #777;
-    font-size: 10px;
-    letter-spacing: 0.1em;
+    color: #b8b8b8;
+    font-size: 12px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
 .stat-value {
-    margin-top: 4px;
+    margin-top: 6px;
     color: #ffffff;
-    font-size: 20px;
+    font-size: 24px;
     line-height: 1.1;
     white-space: nowrap;
 }
@@ -116,16 +116,8 @@ strong {
 }
 
 .skeleton-block,
-.skeleton-line,
-.skeleton-dot {
-    background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.06) 0%,
-        rgba(255, 255, 255, 0.13) 48%,
-        rgba(255, 255, 255, 0.06) 100%
-    );
-    background-size: 220% 100%;
-    animation: skeleton-pulse 1.25s ease-in-out infinite;
+.skeleton-line {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .skeleton-line {
@@ -177,54 +169,6 @@ strong {
     background: rgba(185, 185, 185, 0.32);
 }
 
-.skeleton-dot {
-    position: absolute;
-    left: calc(var(--dot-index, 0) * 9%);
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-}
-
-.skeleton-dot:nth-child(2) {
-    --dot-index: 1;
-}
-
-.skeleton-dot:nth-child(3) {
-    --dot-index: 2;
-}
-
-.skeleton-dot:nth-child(4) {
-    --dot-index: 3;
-}
-
-.skeleton-dot:nth-child(5) {
-    --dot-index: 4;
-}
-
-.skeleton-dot:nth-child(6) {
-    --dot-index: 5;
-}
-
-.skeleton-dot:nth-child(7) {
-    --dot-index: 6;
-}
-
-.skeleton-dot:nth-child(8) {
-    --dot-index: 7;
-}
-
-.skeleton-dot:nth-child(9) {
-    --dot-index: 8;
-}
-
-.skeleton-dot:nth-child(10) {
-    --dot-index: 9;
-}
-
-.skeleton-dot:nth-child(11) {
-    --dot-index: 10;
-}
-
 .skeleton-clears {
     width: 52px;
     height: 38px;
@@ -235,16 +179,6 @@ strong {
     height: 9px;
     margin-top: -8px;
     margin-left: auto;
-}
-
-@keyframes skeleton-pulse {
-    0% {
-        background-position: 120% 0;
-    }
-
-    100% {
-        background-position: -120% 0;
-    }
 }
 
 .dungeon-cards-grid {
@@ -271,14 +205,20 @@ strong {
     position: relative;
 }
 
+.skeleton-card-header {
+    background: rgba(17, 17, 17, 0.78);
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+}
+
 .dungeon-header-gradient {
     position: absolute;
     inset: 0;
     background: linear-gradient(
         to bottom,
-        rgba(0, 0, 0, 0.15) 0%,
-        rgba(0, 0, 0, 0.55) 50%,
-        rgba(13, 13, 13, 0.97) 100%
+        rgba(0, 0, 0, 0.02) 0%,
+        rgba(0, 0, 0, 0.18) 54%,
+        rgba(13, 13, 13, 0.68) 100%
     );
 }
 
@@ -345,7 +285,7 @@ strong {
 .dungeon-timeline-track.is-scrollable {
     overflow-x: scroll;
     scrollbar-width: thin;
-    scrollbar-color: rgba(var(--accent-rgb), 0.72) transparent;
+    scrollbar-color: rgba(var(--accent-rgb), 0.72) rgba(255, 255, 255, 0.06);
 }
 
 .dungeon-timeline-track::-webkit-scrollbar {
@@ -355,6 +295,11 @@ strong {
 .dungeon-timeline-track.is-scrollable::-webkit-scrollbar {
     display: block;
     height: 6px;
+}
+
+.dungeon-timeline-track.is-scrollable::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 999px;
 }
 
 .dungeon-timeline-track::-webkit-scrollbar-track {
@@ -382,6 +327,7 @@ strong {
 }
 
 .dungeon-dot-node {
+    cursor: pointer;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
 }
 
@@ -397,21 +343,74 @@ strong {
     fill: #ef4444;
 }
 
+.dungeon-dot-tooltip {
+    position: absolute;
+    z-index: 3;
+    min-width: 72px;
+    padding: 5px 7px 6px;
+    border-radius: 5px;
+    background: rgba(88, 88, 88, 0.84);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+    color: #ffffff;
+    line-height: 1.05;
+    pointer-events: none;
+    transform: translate(22px, -50%);
+}
+
+.dungeon-dot-tooltip[data-placement="left"] {
+    transform: translate(calc(-100% - 22px), -50%);
+}
+
+.dungeon-dot-tooltip-time {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+.dungeon-dot-tooltip-marker {
+    width: 9px;
+    height: 9px;
+    margin-right: 3px;
+    border-radius: 50%;
+}
+
+.dungeon-dot-tooltip-marker.dot-clear {
+    background: #62d57a;
+}
+
+.dungeon-dot-tooltip-marker.dot-fail {
+    background: #ef4444;
+}
+
+.dungeon-dot-tooltip-age {
+    margin-top: 3px;
+    color: #c7c7c7;
+    font-size: 14px;
+    font-weight: 400;
+    text-align: center;
+    white-space: nowrap;
+}
+
 .dungeon-clears-num {
-    min-width: 52px;
-    font-size: 38px;
+    min-width: 48px;
+    font-size: 34px;
     line-height: 1;
     color: #ffffff;
-    text-align: right;
+    text-align: center;
     white-space: nowrap;
 }
 
 .dungeon-clears-label {
-    font-size: 9px;
-    color: #777;
-    letter-spacing: 0.12em;
-    text-align: right;
+    width: 48px;
+    font-size: 10px;
+    color: #b8b8b8;
+    letter-spacing: 0.08em;
+    text-align: center;
     margin-top: -8px;
+    margin-left: auto;
 }
 
 .dungeon-divider {
@@ -423,19 +422,21 @@ strong {
 .dungeon-stat-row {
     display: flex;
     gap: 8px;
+    text-align: center;
 }
 
 .dungeon-stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .dungeon-stat-col {
     flex: 1;
+    min-width: 0;
 }
 
 .dungeon-stat-value {
-    font-size: 18px;
+    font-size: 20px;
     color: #ffffff;
     white-space: nowrap;
 }
@@ -445,10 +446,390 @@ strong {
 }
 
 .dungeon-stat-label {
-    font-size: 9px;
-    color: #484848;
-    letter-spacing: 0.1em;
+    font-size: 11px;
+    color: #b8b8b8;
+    letter-spacing: 0.08em;
+    line-height: 1.25;
+    margin-top: 5px;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+}
+
+.dungeon-stat-row .skeleton-stat {
+    align-items: center;
+}
+
+.pcgr-page {
+    min-height: 100vh;
+    padding: 18px 0 42px;
+    background:
+        radial-gradient(circle at 15% 8%, rgba(44, 36, 82, 0.38), transparent 26%),
+        linear-gradient(180deg, #050511 0%, #020204 62%, #000000 100%);
+    color: #f4f4f6;
+}
+
+.pcgr-shell {
+    width: min(1000px, calc(100% - 48px));
+    margin: 0 auto;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #0a0a0a;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.pcgr-hero {
+    position: relative;
+    min-height: 180px;
+    overflow: hidden;
+    background-color: #151515;
+    background-position: center;
+    background-size: cover;
+}
+
+.pcgr-hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.55) 100%);
+    backdrop-filter: blur(3px);
+}
+
+.pcgr-hero-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    min-height: 180px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 18px 28px;
+}
+
+.pcgr-date {
+    color: #b9b8bf;
+    font-size: 14px;
+    line-height: 1.1;
+}
+
+.pcgr-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.pcgr-title-row h1 {
+    margin: 0;
+    color: #ffffff;
+    font-size: clamp(22px, 2.4vw, 32px);
+    font-weight: 700;
+    line-height: 0.96;
+    letter-spacing: 0;
+}
+
+.pcgr-success-badge {
+    position: relative;
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.34);
+}
+
+.pcgr-success-badge::before {
+    content: "";
+    width: 11px;
+    height: 6px;
+    border-bottom: 2px solid #19e27a;
+    border-left: 2px solid #19e27a;
+    transform: rotate(-45deg) translate(1px, -1px);
+}
+
+.pcgr-mode-badge {
+    margin-top: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(245, 245, 245, 0.88);
+    color: #202020;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+.pcgr-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 14px;
+    color: #cbc9d0;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.pcgr-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+
+
+.pcgr-table-section {
+    padding: 22px 28px 16px;
+}
+
+.pcgr-table-head,
+.pcgr-player-row {
+    display: grid;
+    grid-template-columns: minmax(200px, 1fr) 90px 90px 90px 80px 100px;
+    align-items: center;
+}
+
+.pcgr-table-head {
+    padding: 0 10px 10px;
+    color: #777783;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+}
+
+.pcgr-player-table {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.pcgr-player-row {
+    position: relative;
+    min-height: 60px;
+    padding: 0 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: #0a0a0a;
+    overflow: hidden;
+}
+
+.pcgr-player-row:last-child {
+    border-bottom: 0;
+}
+
+.pcgr-row-emblem-bg {
+    position: absolute;
+    inset: 0;
+    background-size: auto 100%;
+    background-position: left center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+}
+
+.pcgr-row-emblem-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.18) 0%, rgba(10, 10, 10, 0.72) 40%, #0a0a0a 68%);
+}
+
+.pcgr-player-summary,
+.pcgr-stat-cell,
+.pcgr-time-cell {
+    position: relative;
+    z-index: 1;
+}
+
+.pcgr-player-summary {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 12px;
+}
+
+.pcgr-rank-mark {
+    width: 20px;
+    color: #d49225;
+    font-size: 13px;
+    text-align: center;
+}
+
+.pcgr-player-icon {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    object-fit: cover;
+    border-radius: 2px;
+}
+
+.pcgr-player-icon-empty {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.pcgr-class-mark {
+    display: inline-flex;
+    width: 28px;
+    height: 28px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    color: #efeff2;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.pcgr-player-name-block {
+    min-width: 0;
+}
+
+.pcgr-player-name-row {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+}
+
+.pcgr-player-name {
+    overflow: hidden;
+    color: #f6f6f7;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pcgr-player-subline {
+    display: flex;
+    gap: 6px;
     margin-top: 3px;
+    color: #898994;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.pcgr-mvp-badge {
+    padding: 2px 7px;
+    border: 1px solid rgba(234, 179, 8, 0.55);
+    border-radius: 5px;
+    background: rgba(234, 179, 8, 0.16);
+    color: #facc15;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.pcgr-stat-cell,
+.pcgr-time-cell {
+    color: #d0d0d5;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.1;
+}
+
+.pcgr-time-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+
+.pcgr-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    padding: 16px 28px 20px;
+}
+
+.pcgr-stat-panel {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    background: #0a0a0a;
+    padding: 16px 18px 8px;
+}
+
+.pcgr-stat-panel h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 14px;
+    color: #b8b8b8;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+
+.pcgr-panel-rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.pcgr-panel-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-height: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+    color: #a9a8b1;
+    font-size: 13px;
+}
+
+.pcgr-panel-row:last-child {
+    border-bottom: 0;
+}
+
+.pcgr-panel-row strong {
+    min-width: 0;
+    overflow: hidden;
+    color: #f3f3f5;
+    font-size: 13px;
+    font-weight: 400;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.pcgr-placeholder,
+.pcgr-empty-state {
+    min-height: 520px;
+    padding: 40px;
+    background: #050505;
+}
+
+.pcgr-loading-block,
+.pcgr-loading-line {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.pcgr-loading-block {
+    height: 300px;
+    margin-bottom: 36px;
+}
+
+.pcgr-loading-line {
+    width: min(560px, 74%);
+    height: 28px;
+    margin-bottom: 18px;
+}
+
+.pcgr-loading-line.short {
+    width: min(280px, 42%);
+}
+
+.pcgr-empty-title {
+    color: #ffffff;
+    font-size: 32px;
+}
+
+.pcgr-empty-copy {
+    margin-top: 10px;
+    color: #b8b8b8;
+    font-size: 18px;
 }
 
 @media (max-width: 430px) {
@@ -479,15 +860,144 @@ strong {
     }
 
     .dungeon-stats-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
         row-gap: 12px;
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .skeleton-block,
-    .skeleton-line,
-    .skeleton-dot {
-        animation: none;
+@media (max-width: 720px) {
+    .pcgr-shell {
+        width: min(100% - 24px, 680px);
+    }
+
+    .pcgr-table-section,
+    .pcgr-detail-grid {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .pcgr-table-head {
+        display: none;
+    }
+
+    .pcgr-player-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .pcgr-stat-cell,
+    .pcgr-time-cell {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+    }
+
+    .pcgr-stat-cell:nth-child(2)::before {
+        content: "Kills";
+    }
+
+    .pcgr-stat-cell:nth-child(3)::before {
+        content: "Deaths";
+    }
+
+    .pcgr-stat-cell:nth-child(4)::before {
+        content: "Assists";
+    }
+
+    .pcgr-stat-cell:nth-child(5)::before {
+        content: "K/D";
+    }
+
+    .pcgr-time-cell::before {
+        content: "Time";
+        margin-right: auto;
+    }
+
+    .pcgr-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 620px) {
+    .pcgr-page {
+        padding-top: 0;
+    }
+
+    .pcgr-shell {
+        width: 100%;
+        border-left: 0;
+        border-right: 0;
+    }
+
+    .pcgr-hero,
+    .pcgr-hero-content {
+        min-height: 280px;
+    }
+
+    .pcgr-hero-content {
+        padding: 24px 20px;
+    }
+
+    .pcgr-title-row {
+        gap: 12px;
+    }
+
+    .pcgr-title-row h1 {
+        font-size: 38px;
+    }
+
+    .pcgr-success-badge {
+        width: 44px;
+        height: 44px;
+    }
+
+    .pcgr-date,
+    .pcgr-meta-row,
+    .pcgr-mode-badge {
+        font-size: 18px;
+    }
+
+    .pcgr-meta-row {
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 30px;
+    }
+
+    .pcgr-player-summary {
+        gap: 12px;
+    }
+
+    .pcgr-rank-mark {
+        display: none;
+    }
+
+    .pcgr-player-name {
+        font-size: 23px;
+    }
+
+    .pcgr-class-mark,
+    .pcgr-player-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 18px;
+    }
+
+    .pcgr-player-name-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .pcgr-stat-panel h2 {
+        font-size: 24px;
+    }
+
+    .pcgr-panel-row {
+        min-height: 62px;
+        font-size: 18px;
+    }
+
+    .pcgr-panel-row strong {
+        font-size: 18px;
     }
 }

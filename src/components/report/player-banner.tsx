@@ -1,3 +1,5 @@
+import { formatDuration, formatTimePlayed } from "../../utils/report-format";
+
 interface PlayerBannerProps {
     playerName: string;
     playerCode: string;
@@ -6,22 +8,6 @@ interface PlayerBannerProps {
     totalClears: number;
     speedSum: number;
     totalTimePlayed: number;
-}
-
-function formatDuration(seconds: number): string {
-    if (!seconds || seconds <= 0) return "--";
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    return h > 0 ? `${h}h ${m}m` : `${m}m`;
-}
-
-function formatTimePlayed(seconds: number): string {
-    if (!seconds || seconds <= 0) return "--";
-    const d = Math.floor(seconds / 86400);
-    const h = Math.floor((seconds % 86400) / 3600);
-    if (d > 0) return `${d}d ${h}h`;
-    const m = Math.floor((seconds % 3600) / 60);
-    return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
 export const PlayerBanner = ({
@@ -63,11 +49,11 @@ export const PlayerBanner = ({
     );
 };
 
-function StatBox({ title, value }: { title: string; value: string }) {
+const StatBox = ({ title, value }: { title: string; value: string }) => {
     return (
         <div className="stat-box">
             <div className="stat-title">{title}</div>
             <div className="stat-value">{value}</div>
         </div>
     );
-}
+};

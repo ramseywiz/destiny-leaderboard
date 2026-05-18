@@ -13,7 +13,7 @@ interface ManifestData {
 let sessionVersionChecked = false;
 let manifestVersionPromise: Promise<void> | null = null;
 
-async function ensureVersionCurrent(): Promise<void> {
+const ensureVersionCurrent = async (): Promise<void> => {
     if (sessionVersionChecked) return;
 
     if (!manifestVersionPromise) {
@@ -24,9 +24,9 @@ async function ensureVersionCurrent(): Promise<void> {
     }
 
     await manifestVersionPromise;
-}
+};
 
-async function checkManifestVersion(): Promise<void> {
+const checkManifestVersion = async (): Promise<void> => {
     try {
         const res = await bungieRequest<BungieResponse<ManifestData>>("/Destiny2/Manifest/");
         const liveVersion = res.Response?.version;
@@ -44,11 +44,11 @@ async function checkManifestVersion(): Promise<void> {
     } catch (e) {
         console.warn("Could not verify manifest version:", e);
     }
-}
+};
 
-export async function getActivityDefinition(
+export const getActivityDefinition = async (
     hash: number
-): Promise<DestinyActivityDefinition> {
+): Promise<DestinyActivityDefinition> => {
     const pending = activityDefinitionPromises.get(hash);
     if (pending) return pending;
 
@@ -60,9 +60,9 @@ export async function getActivityDefinition(
     } finally {
         activityDefinitionPromises.delete(hash);
     }
-}
+};
 
-async function loadActivityDefinition(hash: number): Promise<DestinyActivityDefinition> {
+const loadActivityDefinition = async (hash: number): Promise<DestinyActivityDefinition> => {
     await ensureVersionCurrent();
 
     const cacheKey = `${ACT_PREFIX}${hash}`;
@@ -81,4 +81,4 @@ async function loadActivityDefinition(hash: number): Promise<DestinyActivityDefi
 
     localStorage.setItem(cacheKey, JSON.stringify(res.Response));
     return res.Response;
-}
+};
