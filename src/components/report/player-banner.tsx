@@ -37,8 +37,10 @@ export const PlayerBanner = ({
                 )}
 
                 <div className="player-name-block">
-                    <div className="player-name">{playerName}</div>
-                    <div className="player-code">#{playerCode}</div>
+                    <div className="player-name-row">
+                        <span className="player-name">{playerName}</span>
+                        {playerCode && <span className="player-code">#{playerCode}</span>}
+                    </div>
                 </div>
 
                 <StatBox title="Full Clears" value={totalClears > 0 ? String(totalClears) : "--"} />

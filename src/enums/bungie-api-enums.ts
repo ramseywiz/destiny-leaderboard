@@ -159,10 +159,17 @@ export interface DestinyPostGameCarnageEntry {
         killsDeathsRatio?: BasicStat;
         timePlayedSeconds?: BasicStat;
         totalKillDistance?: BasicStat;
-        weaponKillsSuper?: BasicStat;
         [key: string]: BasicStat | undefined;
     };
-    extended?: unknown;
+    extended?: {
+        values?: {
+            weaponKillsSuper?: BasicStat;
+            weaponKillsGrenade?: BasicStat;
+            weaponKillsMelee?: BasicStat;
+            [key: string]: BasicStat | undefined;
+        };
+        weapons?: unknown[];
+    };
 }
 
 export interface DestinyActivityDefinition {

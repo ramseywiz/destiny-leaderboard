@@ -151,7 +151,7 @@ const getCombatStats = (entries: PostGameCarnageEntry[]): HighlightRow[] => {
         0
     );
     const totalSuperKills = entries.reduce(
-        (sum, entry) => sum + getStatValue(entry.values.weaponKillsSuper),
+        (sum, entry) => sum + getStatValue(entry.extended?.values?.weaponKillsSuper),
         0
     );
 
@@ -259,6 +259,10 @@ export const PcgrPage = () => {
     // activityWasStartedFromBeginning is the canonical fresh-run flag from Bungie.
     // undefined = unknown (pre-Witch Queen runs where the field was broken/missing).
     const isFresh = report?.activityWasStartedFromBeginning;
+    const completedEntries = sortedEntries.filter(isCompleted);
+    const isSolo = allCompleted && completedEntries.length === 1;
+    const isFlawless = allCompleted && completedEntries.every((e) => getStatValue(e.values.deaths) === 0);
+    const isSoloFlawless = isSolo && isFlawless;
     const activityName = activityDefinition?.displayProperties?.name ?? "Post Game Report";
     const pgcrImage = activityDefinition?.pgcrImage ?? "";
 
@@ -301,12 +305,23 @@ export const PcgrPage = () => {
                             <h1>{activityName}</h1>
                             {allCompleted && <span className="pcgr-success-badge" aria-label="Completed" />}
                         </div>
-                        {isFresh === true && (
-                            <div className="pcgr-mode-badge pcgr-mode-fresh">Fresh</div>
-                        )}
-                        {isFresh === false && (
-                            <div className="pcgr-mode-badge pcgr-mode-checkpoint">Checkpoint</div>
-                        )}
+                        <div className="pcgr-badge-row">
+                            {isFresh === true && (
+                                <div className="pcgr-mode-badge pcgr-mode-fresh">Fresh</div>
+                            )}
+                            {isFresh === false && (
+                                <div className="pcgr-mode-badge pcgr-mode-checkpoint">Checkpoint</div>
+                            )}
+                            {isSoloFlawless && (
+                                <div className="pcgr-mode-badge pcgr-mode-solo-flawless">Solo Flawless</div>
+                            )}
+                            {!isSoloFlawless && isSolo && (
+                                <div className="pcgr-mode-badge pcgr-mode-solo">Solo</div>
+                            )}
+                            {!isSoloFlawless && isFlawless && (
+                                <div className="pcgr-mode-badge pcgr-mode-flawless">Flawless</div>
+                            )}
+                        </div>
                         <div className="pcgr-meta-row">
                             <span className="pcgr-meta-item">
                                 {formatDuration(activityDuration)}

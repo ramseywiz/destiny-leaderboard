@@ -61,13 +61,16 @@ export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps)
     );
 
     // sub-minute runs are usually api nonsense, dont let them nuke the scale
-    const validTimes = completedRuns
-        .map((r) => r.activityDurationSeconds)
-        .filter((s) => s > 60);
-    const fastestSeconds = validTimes.length > 0 ? Math.min(...validTimes) : 0;
-    const recentClear = [...completedRuns]
-        .filter((r) => r.activityDurationSeconds > 60)
-        .sort((a, b) => new Date(b.period).getTime() - new Date(a.period).getTime())[0];
+    const validRuns = completedRuns.filter((r) => r.activityDurationSeconds > 60);
+    const validTimes = validRuns.map((r) => r.activityDurationSeconds);
+    const fastestClear = validRuns.reduce<ParsedRun | undefined>(
+        (best, r) => (!best || r.activityDurationSeconds < best.activityDurationSeconds ? r : best),
+        undefined
+    );
+    const fastestSeconds = fastestClear?.activityDurationSeconds ?? 0;
+    const recentClear = [...validRuns].sort(
+        (a, b) => new Date(b.period).getTime() - new Date(a.period).getTime()
+    )[0];
     const recentSeconds = recentClear?.activityDurationSeconds ?? 0;
 
     // dungeon.report's "average" line behaves more like a median, which is better here
@@ -84,6 +87,16 @@ export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps)
     const soloFlawlesses = completedRuns.filter(
         (run) => run.playerCount === 1 && run.deaths === 0
     ).length;
+
+    const averageClear = validRuns.reduce<ParsedRun | undefined>(
+        (closest, r) =>
+            !closest ||
+            Math.abs(r.activityDurationSeconds - avgSeconds) <
+                Math.abs(closest.activityDurationSeconds - avgSeconds)
+                ? r
+                : closest,
+        undefined
+    );
 
     const soloTag = getSoloTag(completedRuns);
     const graphWidth = Math.max(chronological.length * GRAPH_DOT_SPACING, 220);
@@ -268,21 +281,45 @@ export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps)
 
             <div className="dungeon-section dungeon-stat-row">
                 <div className="dungeon-stat-col">
-                    <div className="dungeon-stat-value accent">
-                        {formatDuration(fastestSeconds)}
-                    </div>
+                    {fastestClear ? (
+                        <a
+                            className="dungeon-stat-value accent dungeon-stat-link"
+                            onClick={(e) => { e.preventDefault(); navigate(`/pcgr/${fastestClear.instanceId}`); }}
+                            href={`/pcgr/${fastestClear.instanceId}`}
+                        >
+                            {formatDuration(fastestSeconds)}
+                        </a>
+                    ) : (
+                        <div className="dungeon-stat-value accent">--</div>
+                    )}
                     <div className="dungeon-stat-label">FASTEST</div>
                 </div>
                 <div className="dungeon-stat-col">
-                    <div className="dungeon-stat-value accent">
-                        {formatDuration(Math.round(avgSeconds))}
-                    </div>
+                    {averageClear ? (
+                        <a
+                            className="dungeon-stat-value accent dungeon-stat-link"
+                            onClick={(e) => { e.preventDefault(); navigate(`/pcgr/${averageClear.instanceId}`); }}
+                            href={`/pcgr/${averageClear.instanceId}`}
+                        >
+                            {formatDuration(Math.round(avgSeconds))}
+                        </a>
+                    ) : (
+                        <div className="dungeon-stat-value accent">--</div>
+                    )}
                     <div className="dungeon-stat-label">AVERAGE</div>
                 </div>
                 <div className="dungeon-stat-col">
-                    <div className="dungeon-stat-value accent">
-                        {formatDuration(recentSeconds)}
-                    </div>
+                    {recentClear ? (
+                        <a
+                            className="dungeon-stat-value accent dungeon-stat-link"
+                            onClick={(e) => { e.preventDefault(); navigate(`/pcgr/${recentClear.instanceId}`); }}
+                            href={`/pcgr/${recentClear.instanceId}`}
+                        >
+                            {formatDuration(recentSeconds)}
+                        </a>
+                    ) : (
+                        <div className="dungeon-stat-value accent">--</div>
+                    )}
                     <div className="dungeon-stat-label">RECENT</div>
                 </div>
             </div>

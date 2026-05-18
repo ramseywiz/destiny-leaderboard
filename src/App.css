@@ -1,3 +1,85 @@
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: 64px;
+    background: rgba(8, 8, 10, 0.6);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.navbar-inner {
+    display: grid;
+    grid-template-columns: 220px 1fr 220px;
+    align-items: center;
+    height: 100%;
+    padding: 0 24px;
+    gap: 24px;
+}
+
+.navbar-brand {
+    justify-self: start;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.navbar-brand:hover {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.navbar-search-form {
+    width: 100%;
+}
+
+.navbar-search-input {
+    width: 100%;
+    height: 40px;
+    padding: 0 18px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #f4f4f6;
+    font-family: inherit;
+    font-size: 15px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.navbar-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.navbar-search-input:focus {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.navbar-search-input.navbar-search-error {
+    border-color: rgba(239, 68, 68, 0.6);
+}
+
+.navbar-search-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.navbar-right {
+    /* intentionally empty — keeps the brand left and search centered */
+}
+
+.app-content {
+    padding-top: 64px;
+}
+
 body {
     --accent-rgb: 125, 211, 252;
     --accent-color: rgb(var(--accent-rgb));
@@ -38,12 +120,12 @@ strong {
 }
 
 .report-content {
-    width: 90%;
+    width: 85%;
     margin-top: 32px;
 }
 
 .player-card {
-    width: 90%;
+    width: 85%;
     margin: auto;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -71,9 +153,17 @@ strong {
     width: 76px;
     height: 76px;
     object-fit: cover;
+    border-radius: 6px;
 }
 
 .player-name-block {
+    min-width: 0;
+}
+
+.player-name-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0;
     min-width: 0;
 }
 
@@ -86,9 +176,10 @@ strong {
 }
 
 .player-code {
-    margin-top: 6px;
     color: #c3c3c3;
-    font-size: 15px;
+    font-size: 30px;
+    line-height: 1.1;
+    white-space: nowrap;
 }
 
 .stat-box {
@@ -183,7 +274,7 @@ strong {
 
 .dungeon-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
     gap: 18px;
     padding-bottom: 48px;
 }
@@ -445,6 +536,16 @@ strong {
     color: var(--accent-color);
 }
 
+.dungeon-stat-link {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.dungeon-stat-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
 .dungeon-stat-label {
     font-size: 11px;
     color: #b8b8b8;
@@ -549,8 +650,14 @@ strong {
     transform: rotate(-45deg) translate(1px, -1px);
 }
 
-.pcgr-mode-badge {
+.pcgr-badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
     margin-top: 10px;
+}
+
+.pcgr-mode-badge {
     padding: 3px 8px;
     border-radius: 4px;
     font-size: 12px;
@@ -570,6 +677,24 @@ strong {
     background: rgba(234, 179, 8, 0.14);
     border: 1px solid rgba(234, 179, 8, 0.4);
     color: #facc15;
+}
+
+.pcgr-mode-flawless {
+    background: rgba(99, 179, 237, 0.14);
+    border: 1px solid rgba(99, 179, 237, 0.4);
+    color: #90cdf4;
+}
+
+.pcgr-mode-solo {
+    background: rgba(167, 139, 250, 0.14);
+    border: 1px solid rgba(167, 139, 250, 0.4);
+    color: #c4b5fd;
+}
+
+.pcgr-mode-solo-flawless {
+    background: rgba(251, 191, 36, 0.14);
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    color: #fcd34d;
 }
 
 .pcgr-meta-row {
