@@ -195,7 +195,8 @@ export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps)
                                     lineY: GRAPH_LINE_Y,
                                     bottomY: GRAPH_BOTTOM_Y,
                                 });
-                                const label = successful ? "Clear" : "Attempt";
+                                const isFlawless = successful && run.deaths === 0;
+                                const label = isFlawless && run.playerCount === 1 ? "Solo Flawless" : isFlawless ? "Flawless" : successful ? "Clear" : "Attempt";
 
                                 return (
                                     <a
@@ -219,6 +220,19 @@ export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps)
                                         onMouseMove={(event) => showGraphMouseTooltip(event, run, successful)}
                                     >
                                         <circle cx={x} cy={y} r={GRAPH_DOT_RADIUS} />
+                                        {isFlawless && (
+                                            <text
+                                                x={x}
+                                                y={y}
+                                                textAnchor="middle"
+                                                dominantBaseline="central"
+                                                alignmentBaseline="central"
+                                                fontSize="10"
+                                                fill="white"
+                                                pointerEvents="none"
+                                                style={{ userSelect: "none", fontFamily: "serif" }}
+                                            >★</text>
+                                        )}
                                     </a>
                                 );
                             })}

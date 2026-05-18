@@ -3,9 +3,10 @@ import { useParams } from "react-router-dom";
 import { bungieRequest } from "../../api/bungie-api-helper";
 import { getActivityDefinition } from "../../api/manifest-cache";
 import type {
-    BasicStat,
     BungieResponse,
     DestinyActivityDefinition,
+    DestinyPostGameCarnageReport,
+    DestinyPostGameCarnageEntry,
     EmblemLookupResponse,
 } from "../../enums/bungie-api-enums";
 import {
@@ -15,57 +16,8 @@ import {
     formatRatio,
 } from "../../utils/report-format";
 
-interface PostGameCarnageReport {
-    period: string;
-    activityDetails: {
-        referenceId: number;
-        directorActivityHash: number;
-        instanceId: string;
-        mode?: number;
-        modes?: number[];
-        membershipType?: number;
-        isPrivate?: boolean;
-    };
-    entries: PostGameCarnageEntry[];
-    teams?: unknown[];
-}
-
-interface PostGameCarnageEntry {
-    characterId: string;
-    standing?: number;
-    score?: BasicStat;
-    player: {
-        destinyUserInfo: {
-            membershipType: number;
-            membershipId: string;
-            displayName?: string;
-            bungieGlobalDisplayName?: string;
-            bungieGlobalDisplayNameCode?: number;
-            iconPath?: string;
-            applicableMembershipTypes?: number[];
-        };
-        characterClass?: string;
-        classHash?: number;
-        raceHash?: number;
-        genderHash?: number;
-        lightLevel?: number;
-        emblemHash?: number;
-    };
-    values: {
-        completed?: BasicStat;
-        completionReason?: BasicStat;
-        activityDurationSeconds?: BasicStat;
-        kills?: BasicStat;
-        deaths?: BasicStat;
-        assists?: BasicStat;
-        killsDeathsRatio?: BasicStat;
-        timePlayedSeconds?: BasicStat;
-        totalKillDistance?: BasicStat;
-        weaponKillsSuper?: BasicStat;
-        [key: string]: BasicStat | undefined;
-    };
-    extended?: unknown;
-}
+type PostGameCarnageReport = DestinyPostGameCarnageReport;
+type PostGameCarnageEntry = DestinyPostGameCarnageEntry;
 
 interface HighlightRow {
     label: string;
@@ -304,6 +256,9 @@ export const PcgrPage = () => {
     );
     const allCompleted =
         sortedEntries.length > 0 && sortedEntries.every((entry) => isCompleted(entry));
+    // activityWasStartedFromBeginning is the canonical fresh-run flag from Bungie.
+    // undefined = unknown (pre-Witch Queen runs where the field was broken/missing).
+    const isFresh = report?.activityWasStartedFromBeginning;
     const activityName = activityDefinition?.displayProperties?.name ?? "Post Game Report";
     const pgcrImage = activityDefinition?.pgcrImage ?? "";
 
@@ -346,7 +301,12 @@ export const PcgrPage = () => {
                             <h1>{activityName}</h1>
                             {allCompleted && <span className="pcgr-success-badge" aria-label="Completed" />}
                         </div>
-                        <div className="pcgr-mode-badge">Standard</div>
+                        {isFresh === true && (
+                            <div className="pcgr-mode-badge pcgr-mode-fresh">Fresh</div>
+                        )}
+                        {isFresh === false && (
+                            <div className="pcgr-mode-badge pcgr-mode-checkpoint">Checkpoint</div>
+                        )}
                         <div className="pcgr-meta-row">
                             <span className="pcgr-meta-item">
                                 {formatDuration(activityDuration)}
@@ -430,10 +390,11 @@ const PcgrPlayerRow = ({
                         <span className="pcgr-player-name">{getPlayerName(entry)}</span>
                         {isMvp && <span className="pcgr-mvp-badge">MVP</span>}
                     </div>
-                    <div className="pcgr-player-subline">
-                        {className}
-                        {getPlayerCode(entry) && <span>{getPlayerCode(entry)}</span>}
-                    </div>
+                    {getPlayerCode(entry) && (
+                        <div className="pcgr-player-subline">
+                            {getPlayerCode(entry)}
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="pcgr-stat-cell">{formatNumber(kills)}</div>
