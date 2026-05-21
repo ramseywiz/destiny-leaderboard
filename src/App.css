@@ -76,8 +76,6 @@
     white-space: nowrap;
 }
 
-/* ── Search dialog ───────────────────────────────────────────── */
-
 .search-overlay {
     position: fixed;
     inset: 0;
@@ -244,6 +242,7 @@ body {
     --accent-color: rgb(var(--accent-rgb));
     --accent-text: #07121a;
     --muted-text: #c7c6cc;
+    --footer-height: 88px;
     margin: 0;
     background: #121212;
     font-family: 'Open Sans', sans-serif;
@@ -1336,8 +1335,6 @@ strong {
     }
 }
 
-/* ── Footer ──────────────────────────────────────────────────── */
-
 .footer {
     background: rgba(8, 8, 10, 0.6);
     backdrop-filter: blur(14px);
@@ -1414,8 +1411,6 @@ strong {
 .footer-link:hover {
     color: #ffffff;
 }
-
-/* ── About page ──────────────────────────────────────────────── */
 
 .about-page {
     background: #111111;
@@ -1505,8 +1500,6 @@ strong {
     line-height: 1;
 }
 
-/* ── FAQ page ────────────────────────────────────────────────── */
-
 .faq-page {
     background: #111111;
     display: flex;
@@ -1567,17 +1560,27 @@ strong {
     text-underline-offset: 3px;
 }
 
-/* ── Home page ───────────────────────────────────────────────── */
-
 .home-page {
-    background: #111111;
+    --home-background-image: url("/home-background.jpg");
+    position: relative;
+    min-height: calc(100vh - 64px - var(--footer-height));
+    overflow: hidden;
+    background-color: #111111;
+    background-image:
+        linear-gradient(180deg, rgba(17, 17, 17, 0.58) 0%, rgba(17, 17, 17, 0.86) 100%),
+        var(--home-background-image);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 .home-hero {
     display: flex;
     justify-content: center;
+    min-height: calc(100vh - 64px - var(--footer-height));
     padding: 15vh 24px 64px;
     text-align: center;
+    box-sizing: border-box;
 }
 
 .home-hero-content {
