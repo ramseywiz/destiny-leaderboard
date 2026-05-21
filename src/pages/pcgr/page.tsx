@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { bungieRequest } from "../../api/bungie-api-helper";
 import { getActivityDefinition } from "../../api/manifest-cache";
 import type {
+    BasicStat,
     BungieResponse,
     DestinyActivityDefinition,
     DestinyPostGameCarnageReport,
@@ -374,6 +375,7 @@ const PcgrPlayerRow = ({
     rank: number;
     emblemBannerUrl?: string;
 }) => {
+    const navigate = useNavigate();
     const iconUrl = getIconUrl(entry);
     const className = entry.player.characterClass ?? "Guardian";
     const kills = getStatValue(entry.values.kills);
@@ -382,8 +384,17 @@ const PcgrPlayerRow = ({
     const kd = getStatValue(entry.values.killsDeathsRatio);
     const timePlayed = getStatValue(entry.values.timePlayedSeconds);
 
+    const { membershipType, membershipId } = entry.player.destinyUserInfo;
+    const profilePath =
+        membershipType && membershipId
+            ? `/report/${membershipType}/${membershipId}`
+            : null;
+
     return (
-        <div className="pcgr-player-row">
+        <div
+            className={`pcgr-player-row${profilePath ? " is-clickable" : ""}`}
+            onClick={profilePath ? () => navigate(profilePath) : undefined}
+        >
             {emblemBannerUrl && (
                 <div
                     className="pcgr-row-emblem-bg"

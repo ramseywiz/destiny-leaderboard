@@ -7,7 +7,7 @@ import { getDungeonStats, parseDungeonStats } from "../../api/get-dungeon-stats"
 import { getActivityDefinition } from "../../api/manifest-cache";
 import { PlayerBanner } from "../../components/report/player-banner";
 import { DungeonCard } from "../../components/report/dungeon-card";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 import { bungieRequest } from "../../api/bungie-api-helper";
 import { DUNGEON_DEFINITIONS, getDungeonDefinition } from "../../enums/guardianInfo";
 import type {
@@ -26,8 +26,10 @@ export const SummaryPage = () => {
     const [playerCode, setPlayerCode] = useState<string>("-");
     const [bannerUrl, setBannerUrl] = useState<string>("");
     const [iconUrl, setIconUrl] = useState<string>("");
-    const [emblemAccent, setEmblemAccent] = useState<string>("125, 211, 252");
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    const [isProfileLoading, setIsProfileLoading] = useState<boolean>(true);
+    const [isDungeonLoading, setIsDungeonLoading] = useState<boolean>(true);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const [totalClears, setTotalClears] = useState(0);
     const [speedSum, setSpeedSum] = useState(0);
@@ -67,7 +69,9 @@ export const SummaryPage = () => {
         fetchedProfileKey.current = profileKey;
 
         const fetchAllData = async () => {
-            setIsLoading(true);
+            setIsProfileLoading(true);
+            setIsDungeonLoading(true);
+            setErrorMessage(null);
             try {
                 const profileRes = await bungieRequest<
                     BungieResponse<DestinyProfileResponse>
@@ -85,10 +89,6 @@ export const SummaryPage = () => {
                 setPlayerCode(profileData.bungieGlobalDisplayNameCode);
 
                 const firstChar = charactersData[characterIds[0]];
-                const { red, green, blue } = firstChar.emblemColor;
-                if ([red, green, blue].every(Number.isFinite)) {
-                    setEmblemAccent(`${red}, ${green}, ${blue}`);
-                }
 
                 const emblemRes = await bungieRequest<
                     BungieResponse<EmblemLookupResponse>
@@ -101,6 +101,7 @@ export const SummaryPage = () => {
                 setIconUrl(
                     `https://www.bungie.net${emblemRes.Response.displayProperties.icon}`
                 );
+                setIsProfileLoading(false);
 
                 const rawData = await getDungeonStats(platform, membershipId, characterIds);
                 const runs: ParsedRun[] = parseDungeonStats(rawData);
@@ -213,22 +214,39 @@ export const SummaryPage = () => {
                 setSpeedSum(speedSumValue);
             } catch (e) {
                 console.error("Failed to fetch data:", e);
-                setPlayerName("Unknown Guardian");
+                const msg = e instanceof Error ? e.message : "";
+                if (msg.includes("404")) {
+                    setErrorMessage("Guardian not found.");
+                } else if (msg.includes("429")) {
+                    setErrorMessage("Bungie is rate limiting requests right now.");
+                } else if (msg.includes("No characters found")) {
+                    setErrorMessage("This account has no Destiny 2 characters.");
+                } else {
+                    setErrorMessage("Something went wrong loading this profile.");
+                }
+                setIsProfileLoading(false);
             } finally {
-                setIsLoading(false);
+                setIsDungeonLoading(false);
             }
         };
 
         fetchAllData();
     }, [platform, membershipId]);
 
-    const reportStyle = {
-        "--background-accent": emblemAccent,
-    } as CSSProperties;
+    if (errorMessage) {
+        return (
+            <div className="report-page">
+                <div className="report-error">
+                    <p className="report-error-message">{errorMessage}</p>
+                    <p className="report-error-hint">Refresh the page or search for another player.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="report-page" style={reportStyle} aria-busy={isLoading}>
-            {isLoading ? (
+        <div className="report-page" aria-busy={isDungeonLoading}>
+            {isProfileLoading ? (
                 <PlayerBannerSkeleton />
             ) : (
                 <PlayerBanner
@@ -243,7 +261,7 @@ export const SummaryPage = () => {
             )}
 
             <div className="report-content">
-                {isLoading ? (
+                {isDungeonLoading ? (
                     <div className="dungeon-cards-grid" aria-hidden="true">
                         {DUNGEON_DEFINITIONS.map((dungeon) => (
                             <DungeonCardSkeleton
