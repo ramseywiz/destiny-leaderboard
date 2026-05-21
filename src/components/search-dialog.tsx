@@ -39,8 +39,8 @@ const cardToResult = (card: UserInfoCard): SearchResult | null => {
 
 type EmblemFetchResult =
     | { status: "ok"; url: string }
-    | { status: "no_characters" }   // real Bungie account, no D2 characters — filter out
-    | { status: "error" };          // network/API failure — keep row, just no icon
+    | { status: "no_characters" }   // real Bungie account, no D2 characters - filter out
+    | { status: "error" };          // network/API failure - keep row, just no icon
 
 const fetchEmblemPath = async (
     membershipType: number,
@@ -247,7 +247,7 @@ export const SearchDialog = ({ onClose }: { onClose: () => void }) => {
                         type="text"
                         value={query}
                         onChange={handleChange}
-                        placeholder="Search for a Guardian…"
+                        placeholder="Search for a Guardian..."
                         spellCheck={false}
                         autoComplete="off"
                     />

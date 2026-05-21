@@ -252,17 +252,12 @@ export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps)
                                     >
                                         <circle cx={x} cy={y} r={GRAPH_DOT_RADIUS} />
                                         {isFlawless && (
-                                            <text
-                                                x={x}
-                                                y={y}
-                                                textAnchor="middle"
-                                                dominantBaseline="central"
-                                                alignmentBaseline="central"
-                                                fontSize="10"
+                                            <path
+                                                d="M0 -4.7L1.1 -1.4L4.5 -1.4L1.8 0.6L2.8 3.9L0 1.9L-2.8 3.9L-1.8 0.6L-4.5 -1.4L-1.1 -1.4Z"
                                                 fill="white"
+                                                transform={`translate(${x} ${y})`}
                                                 pointerEvents="none"
-                                                style={{ userSelect: "none", fontFamily: "serif" }}
-                                            >★</text>
+                                            />
                                         )}
                                     </a>
                                 );

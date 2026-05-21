@@ -28,7 +28,7 @@ export const Navbar = () => {
                             <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" strokeWidth="1.75" />
                             <path d="M13.5 13.5L17 17" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
                         </svg>
-                        <span className="navbar-search-trigger-text">Search for a Guardian…</span>
+                        <span className="navbar-search-trigger-text">Search for a Guardian...</span>
                     </button>
 
                     <div className="navbar-right">
