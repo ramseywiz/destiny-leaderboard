@@ -112,6 +112,66 @@ export interface StatObject {
     value: number;
 }
 
+export interface DestinyPostGameCarnageReport {
+    period: string;
+    activityWasStartedFromBeginning?: boolean;
+    activityDetails: {
+        referenceId: number;
+        directorActivityHash: number;
+        instanceId: string;
+        mode?: number;
+        modes?: number[];
+        membershipType?: number;
+        isPrivate?: boolean;
+    };
+    entries: DestinyPostGameCarnageEntry[];
+    teams?: unknown[];
+}
+
+export interface DestinyPostGameCarnageEntry {
+    characterId: string;
+    standing?: number;
+    score?: BasicStat;
+    player: {
+        destinyUserInfo: {
+            membershipType: number;
+            membershipId: string;
+            displayName?: string;
+            bungieGlobalDisplayName?: string;
+            bungieGlobalDisplayNameCode?: number;
+            iconPath?: string;
+            applicableMembershipTypes?: number[];
+        };
+        characterClass?: string;
+        classHash?: number;
+        raceHash?: number;
+        genderHash?: number;
+        lightLevel?: number;
+        emblemHash?: number;
+    };
+    values: {
+        completed?: BasicStat;
+        completionReason?: BasicStat;
+        activityDurationSeconds?: BasicStat;
+        kills?: BasicStat;
+        deaths?: BasicStat;
+        assists?: BasicStat;
+        killsDeathsRatio?: BasicStat;
+        timePlayedSeconds?: BasicStat;
+        totalKillDistance?: BasicStat;
+        [key: string]: BasicStat | undefined;
+    };
+    extended?: {
+        values?: {
+            weaponKillsSuper?: BasicStat;
+            weaponKillsGrenade?: BasicStat;
+            weaponKillsMelee?: BasicStat;
+            [key: string]: BasicStat | undefined;
+        };
+        weapons?: unknown[];
+    };
+}
+
 export interface DestinyActivityDefinition {
     displayProperties: {
         name: string;

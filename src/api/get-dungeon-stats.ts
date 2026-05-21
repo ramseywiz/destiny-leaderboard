@@ -1,11 +1,11 @@
 import type { ActivitesComponent, BungieResponse, DungeonActivitesData, ParsedRun } from "../enums/bungie-api-enums";
 import { bungieRequest } from "./bungie-api-helper";
 
-export async function getDungeonStats(
+export const getDungeonStats = async (
     membershipType: string,
     destinyMembershipId: string,
     characterIds: number[]
-) {
+) => {
     const fetchCharacter = async (characterId: number) => {
         const allActivities: DungeonActivitesData[] = [];
         let page = 0;
@@ -37,9 +37,9 @@ export async function getDungeonStats(
     return results
         .filter((r): r is PromiseFulfilledResult<DungeonActivitesData[]> => r.status === "fulfilled")
         .flatMap((r) => r.value);
-}
+};
 
-export function parseDungeonStats(dungeonStats: DungeonActivitesData[]): ParsedRun[] {
+export const parseDungeonStats = (dungeonStats: DungeonActivitesData[]): ParsedRun[] => {
     return dungeonStats.map(x => ({
         directorActivityHash: x.activityDetails.directorActivityHash,
         referenceId: x.activityDetails.referenceId,
@@ -53,4 +53,4 @@ export function parseDungeonStats(dungeonStats: DungeonActivitesData[]): ParsedR
         activityDurationSeconds: x.values.activityDurationSeconds?.basic.value ?? 0,
         playerCount: x.values.playerCount?.basic.value ?? 0,
     }));
-}
+};

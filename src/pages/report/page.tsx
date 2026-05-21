@@ -9,7 +9,7 @@ import { PlayerBanner } from "../../components/report/player-banner";
 import { DungeonCard } from "../../components/report/dungeon-card";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { bungieRequest } from "../../api/bungie-api-helper";
-import { getDungeonDefinition } from "../../enums/guardianInfo";
+import { DUNGEON_DEFINITIONS, getDungeonDefinition } from "../../enums/guardianInfo";
 import type {
     BungieResponse,
     DestinyProfileResponse,
@@ -33,8 +33,31 @@ export const SummaryPage = () => {
     const [speedSum, setSpeedSum] = useState(0);
     const [totalTimePlayed, setTotalTimePlayed] = useState(0);
     const [dungeonGroups, setDungeonGroups] = useState<DungeonGroup[]>([]);
+    const [dungeonImageMap, setDungeonImageMap] = useState<Record<string, string>>({});
 
     const fetchedProfileKey = useRef<string | null>(null);
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        DUNGEON_DEFINITIONS.forEach((dungeon) => {
+            getActivityDefinition(dungeon.representativeActivityHash)
+                .then((definition) => {
+                    if (isCancelled || !definition.pgcrImage) return;
+                    setDungeonImageMap((current) => ({
+                        ...current,
+                        [dungeon.id]: definition.pgcrImage,
+                    }));
+                })
+                .catch(() => {
+                    // Placeholder cards can stay gray if a representative definition misses.
+                });
+        });
+
+        return () => {
+            isCancelled = true;
+        };
+    }, []);
 
     useEffect(() => {
         if (!platform || !membershipId) return;
@@ -136,15 +159,27 @@ export const SummaryPage = () => {
                         existing.runs.push(run);
                         if (!existing.pgcrImage && def?.pgcrImage) {
                             existing.pgcrImage = def.pgcrImage;
+                            setDungeonImageMap((current) => ({
+                                ...current,
+                                [dungeon.id]: def.pgcrImage,
+                            }));
                         }
                         return;
+                    }
+
+                    const pgcrImage = def?.pgcrImage ?? "";
+                    if (def?.pgcrImage) {
+                        setDungeonImageMap((current) => ({
+                            ...current,
+                            [dungeon.id]: def.pgcrImage,
+                        }));
                     }
 
                     dungeonMap.set(dungeon.id, {
                         id: dungeon.id,
                         representativeHash: run.referenceId || run.directorActivityHash,
                         activityName: dungeon.name,
-                        pgcrImage: def?.pgcrImage ?? "",
+                        pgcrImage,
                         runs: [run],
                     });
                 });
@@ -210,8 +245,12 @@ export const SummaryPage = () => {
             <div className="report-content">
                 {isLoading ? (
                     <div className="dungeon-cards-grid" aria-hidden="true">
-                        {Array.from({ length: 6 }).map((_, index) => (
-                            <DungeonCardSkeleton key={index} />
+                        {DUNGEON_DEFINITIONS.map((dungeon) => (
+                            <DungeonCardSkeleton
+                                key={dungeon.id}
+                                activityName={dungeon.name}
+                                pgcrImage={dungeonImageMap[dungeon.id] ?? ""}
+                            />
                         ))}
                     </div>
                 ) : (
@@ -220,7 +259,7 @@ export const SummaryPage = () => {
                             <DungeonCard
                                 key={g.id}
                                 activityName={g.activityName}
-                                pgcrImage={g.pgcrImage}
+                                pgcrImage={g.pgcrImage || dungeonImageMap[g.id] || ""}
                                 runs={g.runs}
                             />
                         ))}
@@ -231,7 +270,7 @@ export const SummaryPage = () => {
     );
 };
 
-function PlayerBannerSkeleton() {
+const PlayerBannerSkeleton = () => {
     return (
         <div className="player-card skeleton-card" aria-hidden="true">
             <div className="player-banner skeleton-block" />
@@ -247,23 +286,33 @@ function PlayerBannerSkeleton() {
             </div>
         </div>
     );
-}
+};
 
-function DungeonCardSkeleton() {
+const DungeonCardSkeleton = ({
+    activityName,
+    pgcrImage,
+}: {
+    activityName: string;
+    pgcrImage: string;
+}) => {
     return (
         <div className="dungeon-card skeleton-card">
-            <div className="dungeon-card-header skeleton-block" />
+            <div
+                className="dungeon-card-header skeleton-card-header"
+                style={{
+                    backgroundImage: pgcrImage
+                        ? `url(https://www.bungie.net${pgcrImage})`
+                        : "none",
+                }}
+            >
+                <div className="dungeon-header-content">
+                    <div className="dungeon-activity-name">{activityName}</div>
+                </div>
+            </div>
             <div className="dungeon-section">
                 <div className="dungeon-timeline-row">
                     <div className="skeleton-graph">
                         <div className="skeleton-average-line" />
-                        {Array.from({ length: 10 }).map((_, index) => (
-                            <span
-                                key={index}
-                                className="skeleton-dot"
-                                style={{ top: `${18 + ((index * 17) % 38)}px` }}
-                            />
-                        ))}
                     </div>
                     <div className="skeleton-line skeleton-clears" />
                 </div>
@@ -280,17 +329,16 @@ function DungeonCardSkeleton() {
                 <StatSkeleton />
                 <StatSkeleton />
                 <StatSkeleton />
-                <StatSkeleton />
             </div>
         </div>
     );
-}
+};
 
-function StatSkeleton() {
+const StatSkeleton = () => {
     return (
         <div className="stat-box skeleton-stat">
             <div className="skeleton-line skeleton-stat-title" />
             <div className="skeleton-line skeleton-stat-value" />
         </div>
     );
-}
+};
