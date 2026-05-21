@@ -11,7 +11,7 @@ export const HomePage = () => {
                     <div className="home-hero-content">
                         <h1 className="home-title">Dungeon Oracle</h1>
                         <p className="home-tagline">
-                            View guardian dungeon stats through a Vex Mind.
+                            View guardian's dungeon stats, with stats sourcing from a roaming Vex Hydra.
                         </p>
                         <button
                             className="home-search-btn"

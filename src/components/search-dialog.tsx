@@ -70,6 +70,7 @@ export const SearchDialog = ({ onClose }: { onClose: () => void }) => {
     const [emblems, setEmblems] = useState<Record<string, string>>({});
     const [invalidIds, setInvalidIds] = useState<Set<string>>(new Set());
     const [isSearching, setIsSearching] = useState(false);
+    const [isLoadingEmblems, setIsLoadingEmblems] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
     const [focusedIndex, setFocusedIndex] = useState(-1);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -98,9 +99,12 @@ export const SearchDialog = ({ onClose }: { onClose: () => void }) => {
         return () => { document.body.style.overflow = prev; };
     }, []);
 
-    // Lazily fetch emblems whenever the result list changes
+    // Fetch all emblems in parallel; keep spinner active until every fetch settles
     useEffect(() => {
-        if (results.length === 0) return;
+        if (results.length === 0) {
+            setIsLoadingEmblems(false);
+            return;
+        }
 
         // Cancel any in-flight emblem fetches from a prior search
         emblemAbortRef.current?.abort();
@@ -110,17 +114,21 @@ export const SearchDialog = ({ onClose }: { onClose: () => void }) => {
         setEmblems({});
         setInvalidIds(new Set());
 
-        results.forEach((r) => {
+        Promise.allSettled(
+            results.map((r) => fetchEmblemPath(r.membershipType, r.membershipId).then((result) => ({ r, result })))
+        ).then((settled) => {
             if (controller.signal.aborted) return;
-            fetchEmblemPath(r.membershipType, r.membershipId).then((result) => {
-                if (controller.signal.aborted) return;
-                if (result.status === "ok") {
-                    setEmblems((prev) => ({ ...prev, [r.membershipId]: result.url }));
-                } else if (result.status === "no_characters") {
-                    setInvalidIds((prev) => new Set([...prev, r.membershipId]));
-                }
-                // "error" → leave placeholder, don't remove
+            const newEmblems: Record<string, string> = {};
+            const newInvalid = new Set<string>();
+            settled.forEach((s) => {
+                if (s.status !== "fulfilled") return;
+                const { r, result } = s.value;
+                if (result.status === "ok") newEmblems[r.membershipId] = result.url;
+                else if (result.status === "no_characters") newInvalid.add(r.membershipId);
             });
+            setEmblems(newEmblems);
+            setInvalidIds(newInvalid);
+            setIsLoadingEmblems(false);
         });
 
         return () => controller.abort();
@@ -157,7 +165,9 @@ export const SearchDialog = ({ onClose }: { onClose: () => void }) => {
                 const cards: UserInfoCard[] = res.Response ?? [];
                 const primary = pickPrimaryMembership(cards);
                 const result = primary ? cardToResult(primary) : null;
-                setResults(result ? [result] : []);
+                const next = result ? [result] : [];
+                if (next.length > 0) setIsLoadingEmblems(true);
+                setResults(next);
             } else {
                 const res = await bungieRequest<BungieResponse<UserSearchResponse>>(
                     "/User/Search/GlobalName/0/",
@@ -173,6 +183,7 @@ export const SearchDialog = ({ onClose }: { onClose: () => void }) => {
                     const result = cardToResult(primary);
                     return result ? [result] : [];
                 });
+                if (mapped.length > 0) setIsLoadingEmblems(true);
                 setResults(mapped);
             }
         } catch {
@@ -208,8 +219,9 @@ export const SearchDialog = ({ onClose }: { onClose: () => void }) => {
         }
     };
 
+    const isLoading = isSearching || isLoadingEmblems;
     const visibleResults = results.filter((r) => !invalidIds.has(r.membershipId));
-    const showResults = visibleResults.length > 0 || (hasSearched && !isSearching);
+    const showResults = !isLoading && (visibleResults.length > 0 || hasSearched);
 
     return (
         <div className="search-overlay" onMouseDown={onClose}>
@@ -239,7 +251,7 @@ export const SearchDialog = ({ onClose }: { onClose: () => void }) => {
                         spellCheck={false}
                         autoComplete="off"
                     />
-                    {isSearching && <span className="search-spinner" aria-label="Searching" />}
+                    {isLoading && <span className="search-spinner" aria-label="Searching" />}
                 </div>
 
                 {showResults && (

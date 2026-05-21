@@ -39,10 +39,14 @@ const GRAPH_BOTTOM_Y = GRAPH_HEIGHT - 9;
 const GRAPH_DOT_SPACING = 20;
 const GRAPH_DOT_RADIUS = 5.5;
 
-const getSoloTag = (completedRuns: ParsedRun[]): string | null => {
+const getSoloTag = (completedRuns: ParsedRun[]): { label: string; run?: ParsedRun } | null => {
     const soloRuns = completedRuns.filter((run) => run.playerCount === 1);
-    if (soloRuns.some((run) => run.deaths === 0)) return "Solo Flawless";
-    if (soloRuns.length > 0) return "Solo";
+    const soloFlawlessRun = [...soloRuns]
+        .filter((run) => run.deaths === 0)
+        .sort((a, b) => new Date(b.period).getTime() - new Date(a.period).getTime())[0];
+
+    if (soloFlawlessRun) return { label: "Solo Flawless", run: soloFlawlessRun };
+    if (soloRuns.length > 0) return { label: "Solo" };
     return null;
 };
 
@@ -99,6 +103,7 @@ export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps)
     );
 
     const soloTag = getSoloTag(completedRuns);
+    const soloTagRun = soloTag?.run;
     const graphWidth = Math.max(chronological.length * GRAPH_DOT_SPACING, 220);
 
     const showGraphTooltip = (
@@ -166,7 +171,20 @@ export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps)
 
                 {soloTag && (
                     <div className="dungeon-badge-stack">
-                        <span className="dungeon-card-badge dungeon-solo-tag">{soloTag}</span>
+                        {soloTagRun ? (
+                            <a
+                                className="dungeon-card-badge dungeon-solo-tag dungeon-card-badge-link"
+                                href={`/pcgr/${soloTagRun.instanceId}`}
+                                onClick={(event) => {
+                                    event.preventDefault();
+                                    navigate(`/pcgr/${soloTagRun.instanceId}`);
+                                }}
+                            >
+                                {soloTag.label}
+                            </a>
+                        ) : (
+                            <span className="dungeon-card-badge dungeon-solo-tag">{soloTag.label}</span>
+                        )}
                     </div>
                 )}
 

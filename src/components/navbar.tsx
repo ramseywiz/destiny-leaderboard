@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { SearchDialog } from "./search-dialog";
 
 export const Navbar = () => {
@@ -31,7 +31,24 @@ export const Navbar = () => {
                         <span className="navbar-search-trigger-text">Search for a Guardian…</span>
                     </button>
 
-                    <div className="navbar-right" />
+                    <div className="navbar-right">
+                        <NavLink
+                            to="/about"
+                            className={({ isActive }) =>
+                                `navbar-faq-link${isActive ? " is-active" : ""}`
+                            }
+                        >
+                            About
+                        </NavLink>
+                        <NavLink
+                            to="/faq"
+                            className={({ isActive }) =>
+                                `navbar-faq-link${isActive ? " is-active" : ""}`
+                            }
+                        >
+                            FAQ
+                        </NavLink>
+                    </div>
                 </div>
             </nav>
 
