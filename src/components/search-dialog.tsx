@@ -37,10 +37,24 @@ const cardToResult = (card: UserInfoCard): SearchResult | null => {
     };
 };
 
+const getExactQueryParts = (
+    value: string
+): { displayName: string; displayNameCode: string } | null => {
+    const trimmed = value.trim();
+    const hashIndex = trimmed.lastIndexOf("#");
+    if (hashIndex === -1) return null;
+
+    const displayName = trimmed.slice(0, hashIndex).trim();
+    const displayNameCode = trimmed.slice(hashIndex + 1).trim();
+    if (!displayName || !/^\d{4}$/.test(displayNameCode)) return null;
+
+    return { displayName, displayNameCode };
+};
+
 type EmblemFetchResult =
     | { status: "ok"; url: string }
-    | { status: "no_characters" }   // real Bungie account, no D2 characters - filter out
-    | { status: "error" };          // network/API failure - keep row, just no icon
+    | { status: "no_characters" }
+    | { status: "error" };
 
 const fetchEmblemPath = async (
     membershipType: number,
@@ -58,7 +72,6 @@ const fetchEmblemPath = async (
         return { status: "ok", url: `${BUNGIE_ROOT}${emblemPath}` };
     } catch (err) {
         const msg = err instanceof Error ? err.message : "";
-        // 404 = account exists in search index but has no D2 profile
         if (msg.includes("404")) return { status: "no_characters" };
         return { status: "error" };
     }
@@ -75,15 +88,14 @@ export const SearchDialog = ({ onClose }: { onClose: () => void }) => {
     const [focusedIndex, setFocusedIndex] = useState(-1);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const emblemAbortRef = useRef<AbortController | null>(null);
+    const exactSubmitInFlightRef = useRef(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
 
-    // Autofocus on mount
     useEffect(() => {
         inputRef.current?.focus();
     }, []);
 
-    // Close on Escape
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
             if (e.key === "Escape") onClose();
@@ -92,21 +104,18 @@ export const SearchDialog = ({ onClose }: { onClose: () => void }) => {
         return () => document.removeEventListener("keydown", onKey);
     }, [onClose]);
 
-    // Lock body scroll while open
     useEffect(() => {
         const prev = document.body.style.overflow;
         document.body.style.overflow = "hidden";
         return () => { document.body.style.overflow = prev; };
     }, []);
 
-    // Fetch all emblems in parallel; keep spinner active until every fetch settles
     useEffect(() => {
         if (results.length === 0) {
             setIsLoadingEmblems(false);
             return;
         }
 
-        // Cancel any in-flight emblem fetches from a prior search
         emblemAbortRef.current?.abort();
         const controller = new AbortController();
         emblemAbortRef.current = controller;
@@ -194,6 +203,42 @@ export const SearchDialog = ({ onClose }: { onClose: () => void }) => {
         }
     };
 
+    const findExactMatch = async (q: string): Promise<SearchResult | null> => {
+        const exactQuery = getExactQueryParts(q);
+        if (!exactQuery) return null;
+
+        const res = await bungieRequest<BungieResponse<UserInfoCard[]>>(
+            "/Destiny2/SearchDestinyPlayerByBungieName/-1/",
+            {
+                method: "POST",
+                body: JSON.stringify(exactQuery),
+            }
+        );
+        const cards: UserInfoCard[] = res.Response ?? [];
+        const primary = pickPrimaryMembership(cards);
+        const result = primary ? cardToResult(primary) : null;
+        if (!result) return null;
+
+        const nameMatches = result.displayName === exactQuery.displayName;
+        const codeMatches = result.displayNameCode === exactQuery.displayNameCode;
+        return nameMatches && codeMatches ? result : null;
+    };
+
+    const handleExactSubmit = async () => {
+        if (!getExactQueryParts(query) || exactSubmitInFlightRef.current) return;
+
+        exactSubmitInFlightRef.current = true;
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        try {
+            const result = await findExactMatch(query);
+            if (result) handleSelect(result);
+        } catch {
+            return;
+        } finally {
+            exactSubmitInFlightRef.current = false;
+        }
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setQuery(val);
@@ -214,8 +259,9 @@ export const SearchDialog = ({ onClose }: { onClose: () => void }) => {
         } else if (e.key === "ArrowUp") {
             e.preventDefault();
             setFocusedIndex((i) => Math.max(i - 1, -1));
-        } else if (e.key === "Enter" && focusedIndex >= 0) {
-            handleSelect(results[focusedIndex]);
+        } else if (e.key === "Enter") {
+            e.preventDefault();
+            void handleExactSubmit();
         }
     };
 

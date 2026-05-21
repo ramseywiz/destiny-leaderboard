@@ -9,7 +9,6 @@ interface ManifestData {
     version: string;
 }
 
-// manifest calls add up fast, so cache them until bungie bumps the version
 let sessionVersionChecked = false;
 let manifestVersionPromise: Promise<void> | null = null;
 

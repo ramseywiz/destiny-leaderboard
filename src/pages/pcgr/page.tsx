@@ -79,7 +79,7 @@ const getActivityDefinitionFromReport = async (
         try {
             return await getActivityDefinition(hash);
         } catch {
-            // Bungie occasionally has missing manifest rows for variants; try the fallback.
+            continue;
         }
     }
 
@@ -257,8 +257,6 @@ export const PcgrPage = () => {
     );
     const allCompleted =
         sortedEntries.length > 0 && sortedEntries.every((entry) => isCompleted(entry));
-    // activityWasStartedFromBeginning is the canonical fresh-run flag from Bungie.
-    // undefined = unknown (pre-Witch Queen runs where the field was broken/missing).
     const isFresh = report?.activityWasStartedFromBeginning;
     const completedEntries = sortedEntries.filter(isCompleted);
     const isSolo = allCompleted && completedEntries.length === 1;

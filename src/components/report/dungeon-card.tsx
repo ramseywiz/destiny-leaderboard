@@ -64,7 +64,6 @@ export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps)
         (a, b) => new Date(a.period).getTime() - new Date(b.period).getTime()
     );
 
-    // sub-minute runs are usually api nonsense, dont let them nuke the scale
     const validRuns = completedRuns.filter((r) => r.activityDurationSeconds > 60);
     const validTimes = validRuns.map((r) => r.activityDurationSeconds);
     const fastestClear = validRuns.reduce<ParsedRun | undefined>(
@@ -77,7 +76,6 @@ export const DungeonCard = ({ activityName, pgcrImage, runs }: DungeonCardProps)
     )[0];
     const recentSeconds = recentClear?.activityDurationSeconds ?? 0;
 
-    // dungeon.report's "average" line behaves more like a median, which is better here
     const avgSeconds = median(validTimes);
     const graphTimes = graphRuns
         .map((r) => r.activityDurationSeconds)

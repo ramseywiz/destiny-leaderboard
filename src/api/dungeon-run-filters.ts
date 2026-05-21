@@ -3,8 +3,7 @@ import type { ParsedRun } from "../enums/bungie-api-enums";
 export const isSuccessfulCompletion = (run: ParsedRun): boolean => {
     return (
         run.completed &&
-        run.completionReason === 0 &&
-        !(run.assists === 0 && run.kills === 0)
+        (run.completionReason === 0 || run.completionReason === 1)
     );
 };
 

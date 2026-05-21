@@ -15,7 +15,6 @@ export const getDungeonStats = async (
                 `/Destiny2/${membershipType}/Account/${destinyMembershipId}/Character/${characterId}/Stats/Activities/?mode=82&count=250&page=${page}`
             );
 
-            // bungie pages history forever, empty page means we're done
             const activities = res.Response?.activities;
             if (!activities || activities.length === 0) break;
 
@@ -29,7 +28,6 @@ export const getDungeonStats = async (
         return allActivities;
     };
 
-    // one broken character shouldnt kill the whole profile
     const results = await Promise.allSettled(
         characterIds.map((x) => fetchCharacter(x))
     );

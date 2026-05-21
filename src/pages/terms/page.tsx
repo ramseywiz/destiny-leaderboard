@@ -11,7 +11,7 @@ export const TermsPage = () => {
                     <div className="faq-item">
                         <p className="faq-question">Acceptance of terms</p>
                         <p className="faq-answer">
-                            By accessing or using Dungeon Oracle ("the site"), you agree to
+                            By accessing or using Dungeon Radar ("the site"), you agree to
                             these Terms of Use. If you do not agree, please do not use the site.
                         </p>
                     </div>
@@ -19,7 +19,7 @@ export const TermsPage = () => {
                     <div className="faq-item">
                         <p className="faq-question">What this site is</p>
                         <p className="faq-answer">
-                            Dungeon Oracle is a free, read-only stat viewer for Destiny 2
+                            Dungeon Radar is a free, read-only stat viewer for Destiny 2
                             dungeon activity. It is a fan-made project and is not affiliated
                             with, endorsed by, or sponsored by Bungie, Inc. Destiny 2 and all
                             related marks are trademarks of Bungie, Inc.
@@ -66,7 +66,7 @@ export const TermsPage = () => {
                     <div className="faq-item">
                         <p className="faq-question">Limitation of liability</p>
                         <p className="faq-answer">
-                            To the fullest extent permitted by law, Dungeon Oracle and its
+                            To the fullest extent permitted by law, Dungeon Radar and its
                             developer shall not be liable for any damages arising from your use
                             of, or inability to use, this site or the information it provides.
                         </p>

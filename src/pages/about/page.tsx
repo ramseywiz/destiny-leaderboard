@@ -7,7 +7,7 @@ export const AboutPage = () => {
                 <div className="about-section">
                     <h2 className="about-subheading">What is this?</h2>
                     <p className="about-body">
-                        Dungeon Oracle is a stat tracker for Destiny 2 dungeons.
+                        Dungeon Radar is a stat tracker for Destiny 2 dungeons.
                         The app lets you look up any guardian by their Bungie name and view the
                         history of their dungeon runs: completion counts, clear times, flawless
                         and solo attempts, and individual instances.
@@ -36,7 +36,14 @@ export const AboutPage = () => {
                                 <p className="about-body">
                                     Click the search bar in the navbar or on the home page. Type a
                                     Bungie name; if you don't play Destiny, here's mine: ram#2028.
-                                    (you can also click here to directly go to my page.)
+                                    (you can also{" "}
+                                    <a
+                                        href="https://dungeonradar.com/report/3/4611686018504884058"
+                                        className="about-link"
+                                    >
+                                        click here
+                                    </a>{" "}
+                                    to directly go to my page.)
                                 </p>
                             </div>
                         </div>
@@ -74,7 +81,14 @@ export const AboutPage = () => {
                                 <p className="about-body">
                                     Clicking any dot on the timeline, or any of the Fastest,
                                     Average, or Recent stat values, opens the Post-Game Carnage
-                                    Report (PCGR) for that specific run (example run shown here). This shows the full
+                                    Report (PCGR) for that specific run (
+                                    <a
+                                        href="https://dungeonradar.com/pcgr/16686952986"
+                                        className="about-link"
+                                    >
+                                        example run shown here
+                                    </a>
+                                    ). This shows the full
                                     fireteam, each player's kills, deaths, assists, K/D, and time
                                     played, along with badges for Fresh start, Flawless, Solo, and
                                     Solo Flawless completions. Clicking a player row navigates to
