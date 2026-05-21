@@ -257,6 +257,28 @@ strong {
     align-items: center;
 }
 
+.report-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 80px 24px;
+    text-align: center;
+}
+
+.report-error-message {
+    font-size: 18px;
+    color: #e8e8ea;
+    margin: 0 0 10px;
+}
+
+.report-error-hint {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.35);
+    margin: 0;
+}
+
 .report-content {
     width: 85%;
     margin-top: 32px;

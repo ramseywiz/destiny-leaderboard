@@ -29,6 +29,7 @@ export const SummaryPage = () => {
     const [emblemAccent, setEmblemAccent] = useState<string>("125, 211, 252");
     const [isProfileLoading, setIsProfileLoading] = useState<boolean>(true);
     const [isDungeonLoading, setIsDungeonLoading] = useState<boolean>(true);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const [totalClears, setTotalClears] = useState(0);
     const [speedSum, setSpeedSum] = useState(0);
@@ -70,6 +71,7 @@ export const SummaryPage = () => {
         const fetchAllData = async () => {
             setIsProfileLoading(true);
             setIsDungeonLoading(true);
+            setErrorMessage(null);
             try {
                 const profileRes = await bungieRequest<
                     BungieResponse<DestinyProfileResponse>
@@ -216,7 +218,16 @@ export const SummaryPage = () => {
                 setSpeedSum(speedSumValue);
             } catch (e) {
                 console.error("Failed to fetch data:", e);
-                setPlayerName("Unknown Guardian");
+                const msg = e instanceof Error ? e.message : "";
+                if (msg.includes("404")) {
+                    setErrorMessage("Guardian not found.");
+                } else if (msg.includes("429")) {
+                    setErrorMessage("Bungie is rate limiting requests right now.");
+                } else if (msg.includes("No characters found")) {
+                    setErrorMessage("This account has no Destiny 2 characters.");
+                } else {
+                    setErrorMessage("Something went wrong loading this profile.");
+                }
                 setIsProfileLoading(false);
             } finally {
                 setIsDungeonLoading(false);
@@ -229,6 +240,17 @@ export const SummaryPage = () => {
     const reportStyle = {
         "--background-accent": emblemAccent,
     } as CSSProperties;
+
+    if (errorMessage) {
+        return (
+            <div className="report-page" style={reportStyle}>
+                <div className="report-error">
+                    <p className="report-error-message">{errorMessage}</p>
+                    <p className="report-error-hint">Refresh the page or search for another player.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="report-page" style={reportStyle} aria-busy={isDungeonLoading}>
