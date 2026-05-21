@@ -50,7 +50,6 @@ export const bungieRequest = async <T>(path: string, options: RequestInit = {}):
         const envelope = data as BungieEnvelope;
 
         if (typeof envelope.ErrorCode === "number" && envelope.ErrorCode !== 1) {
-            // ErrorCode 36 = ThrottledException
             if (envelope.ErrorCode === 36 && typeof envelope.ThrottleSeconds === "number") {
                 setThrottle(envelope.ThrottleSeconds);
             }

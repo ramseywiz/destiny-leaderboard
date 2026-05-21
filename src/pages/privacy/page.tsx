@@ -11,7 +11,7 @@ export const PrivacyPage = () => {
                     <div className="faq-item">
                         <p className="faq-question">No personal data is collected</p>
                         <p className="faq-answer">
-                            Dungeon Oracle does not collect, store, or transmit any personal
+                            Dungeon Radar does not collect, store, or transmit any personal
                             information. There are no user accounts, no registration, and no
                             login. The site has no backend, meaning all requests go directly from your
                             browser to the Bungie API.
@@ -50,7 +50,7 @@ export const PrivacyPage = () => {
                             >
                                 Privacy Policy
                             </a>
-                            . Dungeon Oracle does not use any analytics, advertising, or
+                            . Dungeon Radar does not use any analytics, advertising, or
                             tracking services.
                         </p>
                     </div>

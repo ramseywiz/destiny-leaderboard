@@ -9,9 +9,9 @@ export const HomePage = () => {
             <div className="home-page">
                 <section className="home-hero">
                     <div className="home-hero-content">
-                        <h1 className="home-title">Dungeon Oracle</h1>
+                        <h1 className="home-title">Dungeon Radar</h1>
                         <p className="home-tagline">
-                            View guardian's dungeon stats, with stats sourcing from a roaming Vex Hydra.
+                            View Destiny 2 dungeon stats for any Guardian, with stats sourced directly from the Bungie API.
                         </p>
                         <button
                             className="home-search-btn"
@@ -28,6 +28,16 @@ export const HomePage = () => {
                             </svg>
                             Search for a Guardian...
                         </button>
+                        <p className="home-tagline">
+                            Don't play Destiny?{" "}
+                            <a
+                                href="https://dungeonradar.com/report/3/4611686018504884058"
+                                className="home-link"
+                            >
+                                Click here
+                            </a>{" "}
+                            to go to my profile and see what it looks like.
+                        </p>
                     </div>
                 </section>
             </div>

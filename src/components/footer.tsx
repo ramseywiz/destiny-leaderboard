@@ -50,7 +50,7 @@ export const Footer = () => {
                     </div>
                 </div>
                 <div className="footer-bottom">
-                    <span className="footer-text footer-text-muted">Dungeon Oracle v1</span>
+                    <span className="footer-text footer-text-muted">Dungeon Radar v1</span>
                     <div className="footer-links">
                         <Link to="/about" className="footer-link">About</Link>
                         <Link to="/faq" className="footer-link">FAQ</Link>

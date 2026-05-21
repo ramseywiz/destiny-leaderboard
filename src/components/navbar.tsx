@@ -10,7 +10,7 @@ export const Navbar = () => {
             <nav className="navbar">
                 <div className="navbar-inner">
                     <Link to="/" className="navbar-brand">
-                        Dungeon Oracle
+                        Dungeon Radar
                     </Link>
 
                     <button

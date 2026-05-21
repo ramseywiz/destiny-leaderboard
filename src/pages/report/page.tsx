@@ -51,9 +51,7 @@ export const SummaryPage = () => {
                         [dungeon.id]: definition.pgcrImage,
                     }));
                 })
-                .catch(() => {
-                    // Placeholder cards can stay gray if a representative definition misses.
-                });
+                .catch(() => undefined);
         });
 
         return () => {
@@ -136,7 +134,6 @@ export const SummaryPage = () => {
 
                 await fetchDefinitions(runs.map((run) => run.referenceId));
 
-                // most runs map from referenceId. directorActivityHash is just the fallback.
                 const fallbackRuns = runs.filter((run) => {
                     const refDef = definitions.get(run.referenceId);
                     return !getDungeonDefinition(refDef?.displayProperties?.name ?? "");
@@ -148,7 +145,18 @@ export const SummaryPage = () => {
                     definitions.get(run.directorActivityHash) ??
                     null;
 
-                const dungeonMap = new Map<string, DungeonGroup>();
+                const dungeonMap = new Map<string, DungeonGroup>(
+                    DUNGEON_DEFINITIONS.map((dungeon) => [
+                        dungeon.id,
+                        {
+                            id: dungeon.id,
+                            representativeHash: dungeon.representativeActivityHash,
+                            activityName: dungeon.name,
+                            pgcrImage: "",
+                            runs: [],
+                        },
+                    ])
+                );
 
                 runs.forEach((run) => {
                     const def = getRunDefinition(run);
@@ -156,33 +164,16 @@ export const SummaryPage = () => {
                     if (!dungeon) return;
 
                     const existing = dungeonMap.get(dungeon.id);
-                    if (existing) {
-                        existing.runs.push(run);
-                        if (!existing.pgcrImage && def?.pgcrImage) {
-                            existing.pgcrImage = def.pgcrImage;
-                            setDungeonImageMap((current) => ({
-                                ...current,
-                                [dungeon.id]: def.pgcrImage,
-                            }));
-                        }
-                        return;
-                    }
+                    if (!existing) return;
 
-                    const pgcrImage = def?.pgcrImage ?? "";
+                    existing.runs.push(run);
                     if (def?.pgcrImage) {
+                        existing.pgcrImage ||= def.pgcrImage;
                         setDungeonImageMap((current) => ({
                             ...current,
                             [dungeon.id]: def.pgcrImage,
                         }));
                     }
-
-                    dungeonMap.set(dungeon.id, {
-                        id: dungeon.id,
-                        representativeHash: run.referenceId || run.directorActivityHash,
-                        activityName: dungeon.name,
-                        pgcrImage,
-                        runs: [run],
-                    });
                 });
 
                 const groups: DungeonGroup[] = Array.from(dungeonMap.values()).sort(
@@ -195,7 +186,6 @@ export const SummaryPage = () => {
 
                 setDungeonGroups(groups);
 
-                // totals come from the grouped cards so exotic missions cant sneak back in
                 const groupedRuns = dedupeRunsByInstanceId(groups.flatMap((g) => g.runs));
                 const completedAll = groupedRuns.filter(isSuccessfulCompletion);
                 setTotalClears(completedAll.length);
@@ -203,7 +193,6 @@ export const SummaryPage = () => {
                     groupedRuns.reduce((sum, r) => sum + r.activityDurationSeconds, 0)
                 );
 
-                // speed time is the sum of each dungeon's pb
                 const speedSumValue = groups.reduce((total, g) => {
                     const validTimes = g.runs
                         .filter((r) => isSuccessfulCompletion(r) && r.activityDurationSeconds > 60)
