@@ -1,79 +1,41 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { bungieRequest } from "../api/bungie-api-helper";
-import type { BungieResponse, UserInfoCard } from "../enums/bungie-api-enums";
+import { Link } from "react-router-dom";
+import { SearchDialog } from "./search-dialog";
 
 export const Navbar = () => {
-    const [query, setQuery] = useState("");
-    const [isSearching, setIsSearching] = useState(false);
-    const [error, setError] = useState(false);
-    const navigate = useNavigate();
-
-    const handleSearch = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const trimmed = query.trim();
-        if (!trimmed || isSearching) return;
-
-        const hashIndex = trimmed.lastIndexOf("#");
-        if (hashIndex === -1) return;
-
-        const displayName = trimmed.slice(0, hashIndex);
-        const displayNameCode = trimmed.slice(hashIndex + 1);
-
-        if (!displayName || !displayNameCode) return;
-
-        setIsSearching(true);
-        setError(false);
-
-        try {
-            const res = await bungieRequest<BungieResponse<UserInfoCard[]>>(
-                "/Destiny2/SearchDestinyPlayerByBungieName/-1/",
-                {
-                    method: "POST",
-                    body: JSON.stringify({ displayName, displayNameCode }),
-                }
-            );
-
-            const profile = res.Response?.[0];
-            if (!profile?.membershipType || !profile?.membershipId) {
-                setError(true);
-                return;
-            }
-
-            navigate(`/report/${profile.membershipType}/${profile.membershipId}`);
-            setQuery("");
-        } catch {
-            setError(true);
-        } finally {
-            setIsSearching(false);
-        }
-    };
+    const [dialogOpen, setDialogOpen] = useState(false);
 
     return (
-        <nav className="navbar">
-            <div className="navbar-inner">
-                <Link to="/" className="navbar-brand">
-                    Dungeon Oracle
-                </Link>
+        <>
+            <nav className="navbar">
+                <div className="navbar-inner">
+                    <Link to="/" className="navbar-brand">
+                        Dungeon Oracle
+                    </Link>
 
-                <form className="navbar-search-form" onSubmit={handleSearch}>
-                    <input
-                        className={`navbar-search-input${error ? " navbar-search-error" : ""}`}
-                        type="text"
-                        value={query}
-                        onChange={(e) => {
-                            setQuery(e.target.value);
-                            setError(false);
-                        }}
-                        placeholder="name#0000"
-                        disabled={isSearching}
-                        spellCheck={false}
-                        autoComplete="off"
-                    />
-                </form>
+                    <button
+                        className="navbar-search-trigger"
+                        onClick={() => setDialogOpen(true)}
+                        aria-label="Open search"
+                    >
+                        <svg
+                            className="navbar-search-trigger-icon"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden="true"
+                        >
+                            <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" strokeWidth="1.75" />
+                            <path d="M13.5 13.5L17 17" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+                        </svg>
+                        <span className="navbar-search-trigger-text">Search for a Guardian…</span>
+                    </button>
 
-                <div className="navbar-right" />
-            </div>
-        </nav>
+                    <div className="navbar-right" />
+                </div>
+            </nav>
+
+            {dialogOpen && <SearchDialog onClose={() => setDialogOpen(false)} />}
+        </>
     );
 };

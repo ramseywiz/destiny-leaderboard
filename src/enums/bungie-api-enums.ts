@@ -206,3 +206,16 @@ export interface DungeonGroup {
     pgcrImage: string;
     runs: ParsedRun[];
 }
+
+export interface UserSearchResponseDetail {
+    bungieNetMembershipId: string;
+    bungieGlobalDisplayName: string;
+    bungieGlobalDisplayNameCode: number;
+    destinyMemberships: UserInfoCard[];
+}
+
+export interface UserSearchResponse {
+    searchResults: UserSearchResponseDetail[];
+    page: number;
+    hasMore: boolean;
+}

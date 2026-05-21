@@ -27,7 +27,8 @@ export const SummaryPage = () => {
     const [bannerUrl, setBannerUrl] = useState<string>("");
     const [iconUrl, setIconUrl] = useState<string>("");
     const [emblemAccent, setEmblemAccent] = useState<string>("125, 211, 252");
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isProfileLoading, setIsProfileLoading] = useState<boolean>(true);
+    const [isDungeonLoading, setIsDungeonLoading] = useState<boolean>(true);
 
     const [totalClears, setTotalClears] = useState(0);
     const [speedSum, setSpeedSum] = useState(0);
@@ -67,7 +68,8 @@ export const SummaryPage = () => {
         fetchedProfileKey.current = profileKey;
 
         const fetchAllData = async () => {
-            setIsLoading(true);
+            setIsProfileLoading(true);
+            setIsDungeonLoading(true);
             try {
                 const profileRes = await bungieRequest<
                     BungieResponse<DestinyProfileResponse>
@@ -101,6 +103,7 @@ export const SummaryPage = () => {
                 setIconUrl(
                     `https://www.bungie.net${emblemRes.Response.displayProperties.icon}`
                 );
+                setIsProfileLoading(false);
 
                 const rawData = await getDungeonStats(platform, membershipId, characterIds);
                 const runs: ParsedRun[] = parseDungeonStats(rawData);
@@ -214,8 +217,9 @@ export const SummaryPage = () => {
             } catch (e) {
                 console.error("Failed to fetch data:", e);
                 setPlayerName("Unknown Guardian");
+                setIsProfileLoading(false);
             } finally {
-                setIsLoading(false);
+                setIsDungeonLoading(false);
             }
         };
 
@@ -227,8 +231,8 @@ export const SummaryPage = () => {
     } as CSSProperties;
 
     return (
-        <div className="report-page" style={reportStyle} aria-busy={isLoading}>
-            {isLoading ? (
+        <div className="report-page" style={reportStyle} aria-busy={isDungeonLoading}>
+            {isProfileLoading ? (
                 <PlayerBannerSkeleton />
             ) : (
                 <PlayerBanner
@@ -243,7 +247,7 @@ export const SummaryPage = () => {
             )}
 
             <div className="report-content">
-                {isLoading ? (
+                {isDungeonLoading ? (
                     <div className="dungeon-cards-grid" aria-hidden="true">
                         {DUNGEON_DEFINITIONS.map((dungeon) => (
                             <DungeonCardSkeleton

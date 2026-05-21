@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { bungieRequest } from "../../api/bungie-api-helper";
 import { getActivityDefinition } from "../../api/manifest-cache";
 import type {
+    BasicStat,
     BungieResponse,
     DestinyActivityDefinition,
     DestinyPostGameCarnageReport,
